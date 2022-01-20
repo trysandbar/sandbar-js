@@ -1,0 +1,24 @@
+{
+  "name": "sandbar",
+  "version": "0.0.0",
+  "description": "client library for sandbar",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trysandbar/sandbar-js.git"
+  },
+  "author": {
+    "name": "Ryan Rhee",
+    "email": "ryan@sandbar.ai",
+    "url": "https://github.com/ryanrhee"
+  },
+  "contributors": [],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/trysandbar/sandbar-js/issues"
+  },
+  "homepage": "https://github.com/trysandbar/sandbar-js#readme"
+}
