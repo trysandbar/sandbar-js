@@ -3,6 +3,7 @@ import { program } from "commander"
 import { execFile } from "child_process"
 import path from "path"
 import { promisify } from "util"
+import { promises as fs } from "fs"
 
 const execFileAsync = promisify(execFile)
 
@@ -15,6 +16,14 @@ async function main() {
   const googleapisDir = path.join(process.cwd(), googleapis)
   const outDir = path.join(repoRoot, "generated")
 
+  try {
+    await fs.mkdir(outDir)
+  } catch (error) {
+    if (!isError(error) || error.code !== "EEXIST") {
+      throw error
+    }
+  }
+
   await execFileAsync("protoc", [
     `-I=${protoDir}`,
     `-I=${googleapisDir}`,
@@ -24,6 +33,10 @@ async function main() {
   ])
 }
 
+function isError(error: unknown): error is NodeJS.ErrnoException {
+  return error instanceof Error
+}
+
 if (require.main == module) {
-  main().catch(console.error)
+  main()
 }
