@@ -4,9 +4,20 @@ on: push
 jobs:
   jest:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./sandbar-js
     steps:
       - uses: actions/checkout@v2
+        with:
+          path: sandbar-js
+      - uses: actions/checkout@v2
+        with:
+          repository: googleapis/googleapis
+          path: googleapis
       - name: Install modules
         run: npm i
+      - name: Run codegen
+        run: npm run proto -- --googleapis ../googleapis
       - name: Run tests
         run: npm test
