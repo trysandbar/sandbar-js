@@ -1,5 +1,5 @@
 ---
-name: jest
+name: CI
 on: push
 jobs:
   jest:
