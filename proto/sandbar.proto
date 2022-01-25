@@ -1,0 +1,837 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+
+option java_multiple_files = true;
+option java_package = "io.grpc.sandbar";
+
+package sandbar.v0;
+
+/// Data ingestion service ingests events describing change of state to
+/// different information types.
+service SandbarDataService {
+  // This endpoint takes in events and processes them based on the metadata
+  // associated with them.
+  rpc SubmitEvents(SubmitEventsRequest) returns (SubmitEventsResponse) {
+    option (google.api.http) = {
+      post: "/v0/submit_event"
+      body: "*"
+    };
+  }
+
+  // This simple endpoint just takes in and returns an entity.
+  rpc GetEntity(GetEntityRequest) returns (GetEntityResponse) {
+    option (google.api.http) = {
+      post: "/v0/get_entity"
+      body: "*"
+    };
+  }
+
+  // This end point is used to get information about a given account.
+  rpc GetAccount(GetAccountRequest) returns (GetAccountResponse) {
+    option (google.api.http) = {
+      post: "/v0/get_account"
+      body: "*"
+    };
+  }
+
+  // This is to retrieve the set of latest rule outputs for a given entity for all rules.
+  rpc GetRuleOutputForEntities(GetRuleOutputForEntitiesRequest) returns (GetRuleOutputForEntitiesResponse) {
+    option (google.api.http) = {
+      post: "/v0/results_for_entities"
+      body: "*"
+    };
+  }
+
+  // This endpoint retrieves all the accounts that are associated with a given entity.
+  rpc GetAccountsForEntity(GetAccountsForEntityRequest) returns (GetAccountsForEntityResponse) {
+    option (google.api.http) = {
+      post: "/v0/get_accounts_for_entity"
+      body: "*"
+    };
+  }
+
+  // This endpoint will return all the transactions for a given entity.
+  rpc GetTransactionsForEntity(GetTransactionsForEntityRequest) returns (GetTransactionsForEntityResponse) {
+    option (google.api.http) = {
+      post: "/v0/get_transactions_for_entity"
+      body: "*"
+    };
+  }
+
+  // This query will return a set of specified alerts.
+  rpc GetAlerts(GetAlertsRequest) returns (GetAlertsResponse) {
+    option (google.api.http) = {
+      post: "/v0/get_alerts"
+      body: "*"
+    };
+  }
+
+  // This query will return a set of specified investigations.
+  rpc GetInvestigations(GetInvestigationsRequest) returns (GetInvestigationsResponse) {
+    option (google.api.http) = {
+      post: "/v0/get_investigations"
+      body: "*"
+    };
+  }
+
+  // This query will return all investigations for an entity.
+  rpc GetAllInvestigations(GetAllInvestigationsRequest) returns (GetAllInvestigationsResponse) {
+    option (google.api.http) = {
+      post: "/v0/get_all_investigations"
+      body: "*"
+    };
+  }
+
+  // This allows a user to manually close a given alert. If this closes the last open alert in
+  // an investigation, this call will close the enclolsed investigation as well.
+  rpc CloseAlert(CloseAlertRequest) returns (CloseAlertResponse) {
+    option (google.api.http) = {
+      post: "/v0/close_alert"
+      body: "*"
+    };
+  }
+
+  // This allows a user to manually close a given investigation. This will close all enclosed
+  // alerts that remain open.
+  rpc CloseInvestigation(CloseInvestigationRequest) returns (CloseInvestigationResponse) {
+    option (google.api.http) = {
+      post: "/v0/close_investigation"
+      body: "*"
+    };
+  }
+
+  // This is to retrieve the history of rule output for a given entity for all rules.
+  // Entity search arg because we are essentially looking up the entity where we
+  // then have to
+  rpc GetRuleOutputHistoryForEntity(GetRuleOutputHistoryForEntityRequest) returns (GetRuleOutputHistoryForEntityResponse) {
+    option (google.api.http) = {
+      post: "/v0/results_history_for_entity"
+      body: "*"
+    };
+  }
+
+}
+
+/* @exclude EVENT SECTION */
+
+// Set of events to be processed and ingested by sandbar.
+message SubmitEventsRequest {
+  // List of events to be processed.
+  repeated Event events = 1;
+}
+
+message Event {
+  reserved 1;
+  reserved "change_effective_date";
+  // This is an indication of the type of event that is being sent and of how the data is intended to be processed.
+  EventType type = 2;
+  // The payload of the event. The object in this field represents the state of the object at the time of the event.
+  oneof payload {
+    // Entity payload for the event. The object in this field represents the state of the object at the time of the event. Expect one of this, account, transaction, or account_entity_link.
+    Entity entity = 3;
+    // Account payload for the event. The object in this field represents the state of the object at the time of the event. Expect one of this, entity, transaction, or account_entity_link.
+    Account account = 4;
+    // Transaction payload for the event. The object in this field represents the state of the object at the time of the event. Expect one of this, entity, account, or account_entity_link.
+    Transaction transaction = 5;
+    // Account entity link payload for the event. The object in this field represents the state of the object at the time of the event. Expect one of this, entity, account, or transaction.
+    AccountEntityLink account_entity_link = 6;
+  }
+  // We may have information about a thing that is not quite complete. It may
+  // be missing required info. If you use this flag we will try to make a complete
+  // item, but we will remove some of the validation and requirements that some
+  // pieces of information must be present. We may also generate a uuid as the
+  // source ID if one is not provided.
+  // Incomplete items can be tracked and later appended, merged, etc. if necessary.
+  bool incomplete = 7;
+}
+
+//
+message EventResponse {
+  // The sandbar ID of the item created/changed/deleted by the event.
+  int64 sandbar_id = 1;
+  // The source ID of the item created/changed/deleted by the event that the time the event was sent.
+  string source_id = 2;
+  // Indicator of whether or not a call is successfully processed.
+  bool is_successful = 3;
+  // Message containing information about the processing of the request, including error messages
+  // and information about failure states of one or more request payloads.
+  string message = 4;
+  // In the event that there is an incomplete item, this is the sandbar-generated ID for the object.
+  string generated_id = 5;
+}
+
+// Response from a call to submit events endpoint.
+message SubmitEventsResponse {
+  // List of responses. Not guaranteed to be in the same order as the requests.
+  repeated EventResponse responses = 1;
+  // Message containing information about the processing of the request, including error messages
+  // and information about failure states of one or more request payloads.
+  string message = 2;
+}
+
+/* @exclude ENTITY SECTION */
+
+//
+// Object containing information about a given entity. An entity represents a person,
+// company, or other thing that is potentially able to be an owner of an account.
+message Entity {
+  // The sandbar ID of the given entity.
+  optional int64 sandbar_entity_id = 1;
+  // The ID of the entity in the source system.
+  optional string source_entity_id = 2;
+  // The date the relationship between this entity and the institution began.
+  optional string relationship_begin_date = 3;
+  // Name of the entity.
+  optional string name = 4;
+  // If a person, this field contains their birthdate. If a company, the field contains the incorporation date of the entity.
+  optional string birth_incorporation_date = 5;
+  // The primary address of the entity. For a business, to better assess risk, using a registration address, or a P.O. box gives less information than a headquarters, or a place of operation.
+  optional Address primary_address = 6;
+  // Best email address to reach a client at.
+  optional string email = 7;
+  // A tax identifier for an entity; a TIN or SSN in the U.S. would be preferred.
+  optional string tax_id = 8;
+  // Employer ID Number.
+  optional string ein = 9;
+  // For a business, the NAIC code of the industry they operate in. A full list of NAIC classifications and descriptions can be found at https://www.census.gov/naics/2017NAICS/2017_Definition_File.pdf.
+  optional string naic_code = 10;
+  // For a business, the website they use to operate.
+  optional string website_url = 11;
+  // In the event that we are working with an incomplete entity, this generated ID may be used. This field should not be set upon creation. Sandbar will create this id on the callers behalf.
+  optional string generated_entity_id = 12;
+}
+
+// Query containing entity information.
+message EntityQuery {
+  // A parameter containing information needed to identify an entity.
+  EntityQueryIdParam id = 1;
+  reserved 2, 3;
+  reserved "knowledge_date", "effective_date";
+}
+
+// A request containing information necessary to get rule outputs for a given entity.
+message GetRuleOutputForEntitiesRequest {
+  // Specifies which entities to request for rule outputs for.
+  repeated EntityQuery requests = 1;
+}
+
+// A request containing information necessary to get a given entity.
+message GetEntityRequest {
+  // Specifies entities to request detailed information on.
+  EntityQuery request = 1;
+}
+
+// A response containing requested entity information.
+message GetEntityResponse {
+  // Contents the entities requested.
+  repeated Entity entity = 1;
+  // Message containing information about the processing of the request, including error messages
+  // and information about failure states of one or more request payloads.
+  string message = 2;
+}
+
+/* @exclude ACCOUNT SECTION */
+
+// Information sufficient to identify a given account.
+message AccountIdentifier {
+  // An account number that is at any given point in time globally unique within a given institution.
+  string account_number = 1;
+  // An institution that the given account belongs to.
+  string bank_name = 2;
+}
+
+// Object containing info about an account.
+message Account {
+  // A sandbar ID for a given account.
+  optional int64 sandbar_account_id = 1;
+  // The information used to uniquely identify an account at a given point in time.
+  AccountIdentifier account_identifier = 2;
+  // The type of account.
+  AccountType account_type = 3;
+  // If an account contains crypto-currency, this is the type of currency in the account.
+  optional string crypto_wallet_address = 4;
+  // The type of crypto held in this wallet.
+  optional string crypto_currency = 5;
+  // The date a given account was opened.
+  optional string account_open_date = 6;
+  // The date a given account was closed.
+  optional string account_close_date = 7;
+}
+
+// The request sent when trying to get a specific account from sandbar.
+message GetAccountRequest {
+  oneof id {
+    // A sandbar ID for a given account.
+    int64 sandbar_account_id = 1;
+    // The information used to uniquely identify an account at a given point in time.
+    AccountIdentifier account_identifier = 2;
+  }
+  reserved 3, 4;
+  reserved "knowledge_date", "effective_date";
+}
+
+// Response containing requested account related information and a message.
+message GetAccountResponse {
+  // Set of accounts
+  repeated Account accounts = 1;
+  // Message containing information about the processing of the request, including error messages
+  // and information about failure states of one or more request payloads.
+  string message = 2;
+}
+
+// A transaction may go through many different states in its lifetime. This represents the different
+// stages of a life cycle. A user may update the state on a single transaction over time as it transitions.
+enum TransactionStatus {
+  TRANSACTION_STATUS_UNSPECIFIED = 0;
+  // A transaction that has been initiated but not yet confirmed. Can be ignored in many calculations if never finished.
+  TRANSACTION_STATUS_INITIATED = 1;
+  TRANSACTION_STATUS_PROCESSING = 2;
+  // For most transactions this should be the status that they remain in. This represents a transaction that has been
+  // processed and is now final.
+  TRANSACTION_STATUS_FINISHED = 3;
+  // A transaction that has been declined by the processor.
+  TRANSACTION_STATUS_DECLINED = 4;
+  // A transaction that has been voided by the user.
+  TRANSACTION_STATUS_VOIDED = 5;
+  // A transaction that has been returned.
+  TRANSACTION_STATUS_RETURNED = 6;
+  TRANSACTION_STATUS_OTHER = 100;
+}
+
+//
+// Type of account
+enum AccountType {
+  ACCOUNT_TYPE_UNSPECIFIED = 0;
+  // A checking account
+  ACCOUNT_TYPE_CHECKING = 1;
+  // A savings account
+  ACCOUNT_TYPE_SAVINGS = 2;
+  // A credit card
+  ACCOUNT_TYPE_CREDIT_CARD = 3;
+  // A brokerage account, intended to hold and trade securities.
+  ACCOUNT_TYPE_BROKERAGE = 4;
+  // Another account type not specified here.
+  ACCOUNT_TYPE_OTHER = 100;
+}
+
+// A request payload that allows a user to get a set of accounts for a given entity.
+message GetAccountsForEntityRequest {
+  // Information about the entity qe are trying to get accounts for.
+  EntityQuery request = 1;
+}
+
+// A response payload that contains information about a set of accounts owned by a single entity.
+message GetAccountsForEntityResponse {
+  // Set of accounts
+  repeated Account accounts = 1;
+  // Message containing information about the processing of the request, including error messages
+  // and information about failure states of one or more request payloads.
+  string message = 2;
+}
+
+/* TRANSACTION */
+message Transaction {
+  // A transaction ID generated by Sandbar that uniquely identifies a transaction in our system.
+  optional int64 sandbar_transaction_id = 1;
+  // The unique internal client ID identifying this specific transaction. This should remain unchanged across transaction states.
+  string source_transaction_id = 2;
+  // The amount of cash moved in a given transaction.
+  double transaction_amount = 3;
+  // The currency of the cash that is moved in a given transaction.
+  string transaction_currency = 4;
+  // Account the transaction is associated with.
+  AccountIdentifier account_identifier = 5;
+  // A unique identifier in a source system for a given transaction. This should be consistent between any state transfers that occur for a given transaction.
+  string transaction_source_entity_id = 6;
+  // The identifier in the source system for the transaction counterparty.
+  optional string counterparty_source_entity_id = 7;
+  // The identifier in the source system for the counterparty account.
+  optional AccountIdentifier counterparty_account_identifier = 8;
+  // Free text field used by either party of a transaction to explain the purpose of the activity.
+  optional string originator_to_beneficiary_information = 9;
+  // The type of the specified transaction.
+  TransactionType transaction_type = 10;
+  // The date and time that a transaction was executed.
+  string execute_transaction_date_time = 11;
+  // Field which indicates whether funds flowed into or out of the account.
+  bool is_credit = 12;
+  // Free form text field with information about a transaction.
+  optional string description = 13;
+  // Indicates whether a card was present at the time of the purchase.
+  optional bool is_card_present = 14;
+  // Name of the merchant on the transaction.
+  optional string merchant_name = 15;
+  // The date and time that a transaction settles.
+  optional string settle_transaction_date_time = 16;
+  // The time zone that the transaction occurred in,
+  // as the TZ database name that appears in the IANA time zone database.
+  // Examples include "America/New_York" and "US/Eastern".
+  optional string transaction_time_zone = 17;
+  // Indicates whether the cvv test was issued.
+  optional bool cvv_test = 18;
+  // The IP address from which a transaction is initiated.
+  optional string ip_address = 19;
+  // Swift identifiers of the counterparty bank.
+  optional string counterparty_swift_identifiers = 20;
+  // Address of the merchant on the transaction.
+  optional Address merchant_address = 21;
+  // Address of the bank branch where the transaction occurred.
+  optional Address branch_address = 22;
+  // Address of the ATM where a transaction occurred.
+  optional Address atm_address = 23;
+  // Single point of reference which ties together credit cards by the same issuer of the same rewards type
+  optional string card_reference_number = 24;
+  // 15 digit International Mobile Equipment Identity number that is unique to the device regardless of who manufactured it
+  optional string device_imei = 25;
+  // Unique number used by each manufacturer to identify the device
+  optional string device_serial_number = 26;
+  // Unique Subscriber Identification Module assigned to each card by the service provider
+  optional string device_sim = 27;
+  // Alphanumeric string that uniquely identifies the check, money order, cashier's check, traveler's check, etc. used in the transaction
+  optional string instrument_serial_number = 28;
+  // Shipping address associated with a given transaction.
+  optional Address shipping_address = 29;
+  // Billing address associated with a transaction.
+  optional Address billing_address = 30;
+  // Instrument used for the transmission of funds.  See enumerated list for options and descriptions.
+  ProductType product_type = 31;
+  // Merchant Category Code (MCC) number which identifies the industry of the business.  List of relevant MCC codes can be found here: https://www.web-payment-software.com/online-merchant-accounts/mcc-codes/
+  optional string merchant_type = 32;
+  // The status of a transaction.
+  optional TransactionStatus transaction_status = 33;
+  // The routing number associated with a given transaction.
+  optional int32 transaction_source_routing_number = 34;
+  // The routing number associated with a counterparty in a  given transaction.
+  optional int32 counterparty_routing_number = 35;
+}
+
+// A set of transactions associated with a requested entity.
+message GetTransactionsForEntityResponse {
+  // Set of requested transactions.
+  repeated Transaction transactions = 1;
+  // Message containing information about the processing of the request, including error messages
+  // and information about failure states of one or more request payloads.
+  string message = 2;
+}
+
+// A request that allows a user to get all the transactions associated with a given entity.
+message GetTransactionsForEntityRequest {
+  // Specifies the entity to request information on.
+  EntityQuery request = 1;
+}
+
+/* RULE OUTPUT */
+// Certain actions prompt sandbar to run our suite of rules against an investigation target.
+// Each time this happens, a rule output is generated with information about the risk assessed
+// for that target. This object contains that information.
+message RuleOutput {
+  // This is a unique human-readable name of a given rule.
+  string rule = 1;
+  // This indicates a version of the rule being run.
+  int64 rule_version = 2;
+  // A score indicating the riskiness associated with this rule output. The risk score is bounded between 0 and 100.
+  double risk_score = 3;
+  // A narrative constructed based on the circumstances around the rule being run.
+  string narrative = 4;
+  // The time when the given rule output was generated.
+  string timestamp = 5;
+  // Identifies the investigation target the rule ran against.
+  InvestigationTarget investigation_target = 6;
+  reserved 7, 8;
+  reserved "knowledge_date", "effective_date";
+}
+
+// A response containing rule outputs for a given investigation target.
+message RuleOutputResponse {
+  // Identifies the investigation target the rule ran against.
+  InvestigationTarget investigation_target = 1;
+  // Rule outputs associated with the given investigation target.
+  repeated RuleOutput output = 2;
+}
+
+//
+message GetRuleOutputForEntitiesResponse {
+  // Requested rule outputs.
+  repeated RuleOutputResponse responses = 1;
+  // Message containing information about the processing of the request, including error messages
+  // and information about failure states of one or more request payloads.
+  string message = 2;
+}
+
+// A request payload that contains entity information used to get rule output history for that entity.
+message GetRuleOutputHistoryForEntityRequest {
+  // Specifies the entity to request information on.
+  EntityQuery request = 1;
+}
+
+// A message containing a history of rule outputs for a given entity.
+message GetRuleOutputHistoryForEntityResponse {
+  // All rule outputs generated throughout history for a given entity.
+  RuleOutputResponse response = 1;
+  // Message containing information about the processing of the request, including error messages
+  // and information about failure states of one or more request payloads.
+  string message = 2;
+}
+
+/* Account-Entity Links */
+message AccountEntityLink {
+  // Sandbar ID for the given link. Expected in any change or delete event, but not in a create event.
+  optional int64 sandbar_link_id = 1;
+  oneof account_id {
+    // Expect to see either this or sandbar_account_id. Identifying information for an account from client system.
+    AccountIdentifier source_account_identifier = 2;
+    // Expect to see either this or source_account_identifier. Identifying information for an account from sandbar system.
+    int64 sandbar_account_id = 3;
+  }
+  // Information uniquely identifying an entity.
+  EntityQueryIdParam entity_id = 4;
+  // The date the account is linked to the entity.
+  string start_date = 5;
+  // The date the account is unlinked from the entity.
+  optional string end_date = 6;
+  // Free text field with information about the link.
+  optional string description = 7;
+}
+
+/* @exclude OTHER */
+
+//
+// Object that keeps information about an address.
+message Address {
+  optional string street_address_line_1 = 1;
+  optional string street_address_line_2 = 2;
+  optional string city = 3;
+  optional string state_or_province = 4;
+  optional string zip = 5;
+
+  // two-letter ISO3166 country code
+  string country = 6;
+
+  // Indicates if the address is a standard address, military, PO Box, etc.
+  optional AddressType type = 7;
+}
+
+//
+// The type of event sent over by the user.
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+  // To be sent when creating a new item. If sent when an item already exists
+  // a creation event will fail and nothing will be created in the system.
+  EVENT_TYPE_CREATE = 1;
+  // To be sent when updating an existing item. If the item does not exist
+  // the update will fail and nothing will be changed in the system.
+  EVENT_TYPE_UPDATE = 2;
+  // Delete an entity. This will delete the item as of the time of the call to SubmitEvents().
+  // If an item does not exist the delete will fail.
+  // Please use caution with deletes. They may have some odd side effects that are not
+  // expected as other objects referencing this object may have to continue to use
+  // the deleted item (i.e. if an entity is deleted, an investigation on that entity
+  // may be required to continue to exist.)
+  EVENT_TYPE_DELETE = 3;
+}
+
+// In an Alert, a Next Step is a suggested course of action that an analyst may take to
+// either confirm or alleviate the given described risk.
+message NextStep {
+  // A description of the action to be taken.
+  string description = 1;
+}
+
+// When a rule creates an output that is deemed sufficiently risky, we are able to create an alert.
+// An alert groups all relevant information after the initial trigger into one place.
+message Alert {
+  // Sandbar identifier for a given alert.
+  int64 sandbar_alert_id = 1;
+  // Set of rule outputs associated with a given Alert.
+  repeated RuleOutput outputs = 2;
+  // The investigation target associated with this alert.
+  InvestigationTarget investigation_target = 3;
+  // Set of next steps a user may be able to take to help assess the risk associated with a given alert and help an analyst decide whether or not to file a SAR.
+  repeated NextStep next_steps = 4;
+  // A human readable name of the rule associated with the Alert.
+  string rule = 5;
+  // This indicates a version of a given rule that is being run.
+  int64 rule_version = 6;
+  // High water mark within look-back window
+  double high_water_mark_risk_score = 7;
+  // The status of the investigation into the alert.
+  InvestigationStatus status = 8;
+}
+
+// An investigation is a unit of work comprised of one or more alerts. This is the thing that an analyst or a group
+// of analysts should be working on. There may be one or more targets, and one or more types of risk topographies.
+// By default an investigation groups alerts on a given investigation unit.
+message Investigation {
+  // Sandbar ID of the given investigation.
+  int64 sandbar_investigation_id = 1;
+  // Set of alerts associated with the investigation.
+  repeated Alert alerts = 2;
+  // The targets of a given investigation.
+  repeated InvestigationTarget target = 3;
+  // The status of the investigation.
+  InvestigationStatus status = 4;
+}
+
+// The status of a given investigation.
+enum InvestigationStatus {
+  INVESTIGATION_STATUS_UNSPECIFIED = 0;
+  // An open investigation that requires attention.
+  INVESTIGATION_STATUS_OPEN = 1;
+  // An investigation that has been automatically closed by Sandbar due to its age.
+  INVESTIGATION_STATUS_AUTO_CLOSED = 2;
+  // An investigation that has been manually closed by a user upon assessment that the activity
+  // does not warrant a SAR filing.
+  INVESTIGATION_STATUS_MANUALLY_CLOSED_CLEARED = 3;
+  // An investigation that has been manually closed by a user upon assessment that the activity
+  // is suspicious and requires a SAR filing.
+  INVESTIGATION_STATUS_MANUALLY_CLOSED_SUSPICIOUS = 4;
+  // An investigation that is oh hold pending some internal or external action necessary
+  // to continue the assessment.
+  INVESTIGATION_STATUS_ON_HOLD = 5;
+  // An investigation that is in the process of being worked on by an investigator.
+  INVESTIGATION_STATUS_IN_PROGRESS = 6;
+  // Another investigation status that is not specified here.
+  INVESTIGATION_STATUS_OTHER = 100;
+}
+
+// Request for one or more alerts.
+message GetAlertsRequest {
+  // Sandbar IDs for requested alerts.
+  repeated int64 sandbar_alert_id = 1;
+}
+
+// Response containing requested alerts.
+message GetAlertsResponse {
+  // Requested alerts.
+  repeated Alert alerts = 1;
+  // Message containing information about the processing of the request, including error messages
+  // and information about failure states of one or more request payloads.
+  string message = 2;
+}
+
+// An unfiltered request for investigations.
+message GetAllInvestigationsRequest {
+  // Options for the investigation request.
+  message Options {
+    // If set to `true`, the response will include closed investigations.
+    bool include_closed = 1;
+  }
+  // Options for a given investigation request.
+  optional Options options = 1;
+}
+
+// A response sent in response to a request for all investigations.
+message GetAllInvestigationsResponse {
+  // The set of requested investigations.
+  repeated Investigation investigations = 1;
+  // Message containing information about the processing of the request, including error messages
+  // and information about failure states of one or more request payloads.
+  string message = 2;
+}
+
+// Identifying information about a given entity.
+message EntityQueryIdParam {
+  oneof entity_id {
+    // Sandbar entity ID, expect to see one of this, source_entity_id, or generated_entity_id.
+    int64 sandbar_entity_id = 1;
+    // Entity ID in the source system, expect to see one of this, sandbar_entity_id, or generated_entity_id.
+    string source_entity_id = 2;
+    // Sandbar generated ID for incomplete entities, expect to see one of this, sandbar_entity_id, or source_entity_id.
+    string generated_entity_id = 3;
+  }
+}
+
+// Identifying information about an entity as an Investigation Target
+message TargetEntityId {
+  // Sandbar entity ID for the given investigation target.
+  int64 sandbar_entity_id = 1;
+  // Entity ID in the source system for the given investigation target.
+  optional string source_entity_id = 2;
+  // Sandbar generated ID for incomplete entities for the given investigation target.
+  optional string generated_entity_id = 3;
+}
+
+// Information about a target of an investigation.
+message InvestigationTarget {
+  oneof target {
+    // Information for an entity type target.
+    TargetEntityId entity_id = 1;
+  }
+}
+
+// A request for a set of investigations
+message GetInvestigationsRequest {
+  // Sandbar IDs of investigations to request detailed information on.
+  repeated int64 sandbar_investigation_id = 1;
+}
+
+// A response containing the requested set of investigations.
+message GetInvestigationsResponse {
+  // Set of requested investigations.
+  repeated Investigation investigation = 1;
+  // Message containing information about the processing of the request, including error messages
+  // and information about failure states of one or more request payloads.
+  string message = 2;
+}
+
+// A request to close an alert.
+message CloseAlertRequest {
+  // Sandbar identifier of alert to be closed.
+  int64 sandbar_alert_id = 1;
+}
+
+// A response carrying information about the result of a request to close an alert.
+message CloseAlertResponse {
+  // Information about the disposition of the closed alert.
+  CloseResult result = 1;
+  // Message containing information about the processing of the request, including error messages
+  // and information about failure states of one or more request payloads.
+  string message = 2;
+}
+
+// A request to close an investigation.
+message CloseInvestigationRequest {
+  // Sandbar identifier of investigation to be closed.
+  int64 sandbar_investigation_id = 1;
+}
+
+// A response carrying information about the result of a request to close an investigation.
+message CloseInvestigationResponse {
+  // Information about the disposition of the closed investigation.
+  CloseResult result = 1;
+  // Message containing information about the processing of the request, including error messages
+  // and information about failure states of one or more request payloads.
+  string message = 2;
+}
+
+// The various possible results of a request to close an alert or investigation.
+enum CloseResult {
+  CLOSE_RESULT_UNSPECIFIED = 0;
+  // The item was successfully closed.
+  CLOSE_RESULT_SUCCESSFUL = 1;
+  // The object was not found.
+  CLOSE_RESULT_NOT_FOUND = 2;
+  // The object was already closed and nothing changed.
+  CLOSE_RESULT_ALREADY_CLOSED = 3;
+  // There was some issue closing this item, specified in the message.
+  CLOSE_RESULT_FAILED = 4;
+  CLOSE_RESULT_OTHER = 100;
+}
+
+// Each transaction must specify a transaction type to indicate how money was moved. These are presently
+// derived from the transaction types used to file SAR forms.
+enum TransactionType {
+  TRANSACTION_TYPE_UNSPECIFIED = 0;
+  // Results in a decrease to the balance of the account
+  TRANSACTION_TYPE_WITHDRAWAL = 1;
+  // Results in an increase to the balance of the account
+  TRANSACTION_TYPE_DEPOSIT = 2;
+  // Exchange of funds between two different government issued currencies
+  TRANSACTION_TYPE_CURRENCY_EXCHANGE = 3;
+  // Exchange of denominations in physical cash or coins
+  TRANSACTION_TYPE_CASH_EXCHANGE = 4;
+  // Price charged for a specific service
+  TRANSACTION_TYPE_FEES = 5;
+  // Compulsory contribution to state revenue, levied by the government on workers' income and business profits
+  TRANSACTION_TYPE_TAXES = 6;
+  // Claim upon a part of another's property that arises because of an unpaid debt related to that property
+  TRANSACTION_TYPE_LIENS = 7;
+  // Instruction by an investor to a broker to acquire stock shares, bonds, or other assets
+  TRANSACTION_TYPE_BUY = 8;
+  // Instruction by an investor to a broker to sell stock shares, bonds, or other assets
+  TRANSACTION_TYPE_SELL = 9;
+  // Uses a price to designate the least acceptable amount for the transaction to take place
+  TRANSACTION_TYPE_LIMIT_ORDER = 10;
+  // Uses a price to merely trigger an actual order once the specified price has been traded
+  TRANSACTION_TYPE_STOP_ORDER = 11;
+  // Final transaction to fully zero out the account balance when closing the relationship
+  TRANSACTION_TYPE_ACCOUNT_CLOSING_DEBIT = 12;
+  // Electronic transfer of funds between two individual parties
+  TRANSACTION_TYPE_P2P_PAYMENT = 13;
+  // Electronic transfer of funds between two financial institutions
+  TRANSACTION_TYPE_BANK_TRANSFER = 14;
+  // Electronic transfer of funds involving the exchange of cryptocurrency assets
+  TRANSACTION_TYPE_CRYPTO_TRANSFER = 15;
+  // Trade involving international currencies or their derivatives
+  TRANSACTION_TYPE_FOREX = 16;
+  // Funds distributed by a local, state, or federal agency
+  TRANSACTION_TYPE_GOVERNMENT_PAYMENT = 17;
+  // Derivative contract where two parties exchange the cash flows or liabilities from two different financial instruments
+  TRANSACTION_TYPE_SWAP = 18;
+  // Another transaction type that is not enumerated here.
+  TRANSACTION_TYPE_OTHER = 100;
+}
+
+// A transaction may operate on a specific product type. This field indicates
+// which type of product. These product types are currently derived from the
+// product types used to file SAR forms.
+enum ProductType {
+  PRODUCT_TYPE_UNSPECIFIED = 0;
+  // official government issued currency of the United States
+  PRODUCT_TYPE_US_CURRENCY = 1;
+  // official government issued currency of any country or jurisdiction not including the United States
+  PRODUCT_TYPE_FOREIGN_CURRENCY = 3;
+  // physical paper instrument written, dated, and signed that directs a bank to pay a specific sum of money to the bearer
+  PRODUCT_TYPE_CHECK = 4;
+  // electronic transfer of funds across a network of banks
+  PRODUCT_TYPE_WIRE = 5;
+  // electronic bank-to-bank transfers processed through the Automated Clearing House network
+  PRODUCT_TYPE_ACH = 6;
+  // electronic transfer of money over an online network
+  PRODUCT_TYPE_ELECTRONIC_FUNDS_TRANSFER = 7;
+  // payment card that deducts money directly from a checking account
+  PRODUCT_TYPE_DEBIT_CARD = 8;
+  // payments card in which charges are made against a line of credit instead of deposits
+  PRODUCT_TYPE_CREDIT_CARD = 9;
+  // reloadable card allowing for only the amount of spending that has been deposited to the account
+  PRODUCT_TYPE_PREPAID_CARD = 10;
+  // certificate, usually issued by a government or banking institution, that allows the stated payee to receive cash on demand
+  PRODUCT_TYPE_MONEY_ORDER = 11;
+  // certificate, issued by a banking institution, that allows the stated payee to receive cash on demand
+  PRODUCT_TYPE_CASHIER_CHECK = 12;
+  // physical paper instrument with a fixed amount typically used by people on vacation in foreign countries
+  PRODUCT_TYPE_TRAVELER_CHECK = 13;
+  // short-term unsecured promissory notes issued by companies
+  PRODUCT_TYPE_COMMERCIAL_PAPER = 14;
+  // certificates that assign ownership of a public company
+  PRODUCT_TYPE_STOCKS = 15;
+  // fixed income instrument which represents a loan made by an investor to a borrower
+  PRODUCT_TYPE_BOND_NOTE = 16;
+  // mortgage loan secured by a commercial property
+  PRODUCT_TYPE_COMMERCIAL_MORTGAGE = 17;
+  // loan that the borrower uses to purchase or maintain a home or other form of real estate and agrees to pay back over time
+  PRODUCT_TYPE_MORTGAGE = 18;
+  // legal agreement to buy or sell a particular commodity asset, or security at a predetermined price at a specified time in the future
+  PRODUCT_TYPE_FUTURES = 19;
+  // policy where an individual or entity receives financial protection or reimbursement against losses
+  PRODUCT_TYPE_INSURANCE = 20;
+  // investment vehicle that pools money from investors to purchase a variety of different assets
+  PRODUCT_TYPE_MUTUAL_FUND = 21;
+  // derivative instrument that allows, but does not obligate, the holder to buy or sell the underlying asset
+  PRODUCT_TYPE_OPTION = 22;
+  // equity of a public company with low market capitalization value, usually below $300MM
+  PRODUCT_TYPE_MICROCAP_SECURITY = 23;
+  // security with a value that is reliant upon or derived from, an underlying asset or group of assets
+  PRODUCT_TYPE_DERIVATIVE = 24;
+  // issued by a casino or card club which denotes the convertable amount to USD
+  PRODUCT_TYPE_GAMING_INSTRUMENT = 25;
+  // Another product type that is not enumerated here.
+  PRODUCT_TYPE_OTHER = 100;
+}
+
+// An enum specifying the type of address being used.
+enum AddressType {
+  ADDRESS_TYPE_UNSPECIFIED = 0;
+  // A residential address, usually a home or apartment.
+  ADDRESS_TYPE_RESIDENTIAL = 1;
+  // A business address.
+  ADDRESS_TYPE_BUSINESS = 2;
+  // A Post Office box.
+  ADDRESS_TYPE_PO_BOX = 3;
+  // A military address.
+  ADDRESS_TYPE_MILITARY = 4;
+  // Another address type not enumerated here.
+  ADDRESS_TYPE_OTHER = 100;
+
+}
