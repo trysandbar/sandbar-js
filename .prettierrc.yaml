@@ -3,3 +3,6 @@ overrides:
   - files: "*.md"
     options:
       proseWrap: always
+  - files: ["*.ts", "*.js"]
+    options:
+      semi: false
