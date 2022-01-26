@@ -1,9 +1,22 @@
-import { EventType } from "../generated/sandbar"
-import { Sandbar } from "../src"
+import fetchMock from "jest-fetch-mock"
+jest.setMock("cross-fetch", fetchMock)
 
-test("id string with numeric succeeds", () => {
+import { EventType } from "../generated/sandbar"
+import { Sandbar } from ".."
+
+beforeEach(() => {
+  fetchMock.resetMocks()
+})
+
+test("id string with numeric succeeds", async () => {
   const sandbar = new Sandbar()
-  sandbar.submitEvents([
+  fetchMock.mockIf(
+    /https:\/\/api\.sandbar\.ai\/v0\/submit_event\/?/,
+    async (_req) => {
+      return JSON.stringify({ status: "success" })
+    }
+  )
+  await sandbar.submitEvents([
     {
       type: EventType.CREATE,
       incomplete: false,
@@ -21,10 +34,10 @@ test("id string with numeric succeeds", () => {
   ])
 })
 
-test("id string with non-numeric fails", () => {
+test("id string with non-numeric fails", async () => {
   const sandbar = new Sandbar()
   const alphaId = "abc"
-  expect(() =>
+  await expect(
     sandbar.submitEvents([
       {
         type: EventType.CREATE,
@@ -41,5 +54,8 @@ test("id string with non-numeric fails", () => {
         },
       },
     ])
-  ).toThrowWithMessage(SyntaxError, `Cannot convert ${alphaId} to a BigInt`)
+  ).rejects.toThrowWithMessage(
+    SyntaxError,
+    `Cannot convert ${alphaId} to a BigInt`
+  )
 })

@@ -29,6 +29,7 @@ async function main() {
     `-I=${googleapisDir}`,
     `--ts_out=${outDir}`,
     "--ts_opt=long_type_string",
+    "--ts_opt=generate_dependencies",
     "sandbar.proto",
   ])
 }

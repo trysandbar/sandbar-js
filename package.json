@@ -7,7 +7,7 @@
     "test": "jest",
     "lint": "yamllint",
     "fmt": "prettier",
-    "proto": "./scripts/generate.ts"
+    "proto": "./src/scripts/generate.ts"
   },
   "repository": {
     "type": "git",
@@ -31,10 +31,13 @@
     "commander": "^8.3.0",
     "jest": "^27.4.7",
     "jest-extended": "^1.2.0",
+    "jest-fetch-mock": "^3.0.3",
     "ts-jest": "^27.1.3",
     "ts-node": "^10.4.0"
   },
   "dependencies": {
-    "long": "^5.2.0"
+    "cross-fetch": "^3.1.5",
+    "long": "^5.2.0",
+    "node-fetch": "^3.2.0"
   }
 }
