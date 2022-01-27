@@ -1,14 +1,7 @@
-import {
-  Event,
-  SubmitEventsRequest,
-  SandbarDataService,
-} from "./generated/sandbar"
-import { HttpRule } from "./generated/google/api/http"
-import { readMethodOption } from "@protobuf-ts/runtime-rpc"
+import { Event, SubmitEventsRequest } from "./generated/sandbar"
 import { JsonValue } from "@protobuf-ts/runtime"
 import fetch from "cross-fetch"
-
-const templateMarkers = [":", "*", "{", "}", "="]
+import methodPaths from "./generated/method-paths"
 
 function base64encode(input: string) {
   Buffer.from(input, "utf8").toString("base64")
@@ -28,7 +21,7 @@ class Sandbar {
       events,
     }
     const json = SubmitEventsRequest.toJson(req)
-    const path = getHttpPathForMethod("submitEvents")
+    const path = methodPaths.SubmitEvents
     await this.post(path, json)
   }
 
@@ -59,32 +52,6 @@ class Sandbar {
       Authorization: `Basic ${base64encode(`${username}:${password}`)}`,
     }
   }
-}
-
-function getHttpPathForMethod(method: string) {
-  const rule = readMethodOption(
-    SandbarDataService,
-    method,
-    "google.api.http",
-    HttpRule
-  )
-  if (!rule) {
-    throw new Error("Expected method ${methodName} to have HTTP bindings")
-  }
-  if (rule.body != "*") {
-    throw new Error(
-      "HTTP bindings with any body option other than '*' are not supported"
-    )
-  }
-  if (rule.pattern.oneofKind !== "post") {
-    throw new Error("Only POST bindings are supported")
-  }
-
-  if (rule.pattern.post.match(/[:*{}=]/)) {
-    throw new Error("POST bindings with templates are not supported")
-  }
-
-  return rule.pattern.post
 }
 
 export { Sandbar }

@@ -11,10 +11,10 @@ async function main() {
   program.requiredOption("--googleapis <path>", "path to googleapi repo")
   program.parse(process.argv)
   const { googleapis } = program.opts()
-  const repoRoot = path.relative(path.join(__dirname, ".."), process.cwd())
+  const repoRoot = path.relative(path.join(__dirname, "../.."), process.cwd())
   const protoDir = path.join(repoRoot, "proto")
   const googleapisDir = path.join(process.cwd(), googleapis)
-  const outDir = path.join(repoRoot, "generated")
+  const outDir = path.join(repoRoot, "src/generated")
 
   try {
     await fs.mkdir(outDir)

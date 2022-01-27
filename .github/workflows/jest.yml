@@ -21,6 +21,6 @@ jobs:
       - name: Install modules
         run: npm i
       - name: Run codegen
-        run: npm run proto -- --googleapis ../googleapis
+        run: npm run codegen
       - name: Run tests
         run: npm test

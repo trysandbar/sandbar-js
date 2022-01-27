@@ -7,7 +7,9 @@
     "test": "jest",
     "lint": "yamllint",
     "fmt": "prettier",
-    "proto": "./src/scripts/generate.ts"
+    "gen-proto": "./src/scripts/generate-proto.ts --googleapis ../googleapis",
+    "gen-method-paths": "./src/scripts/generate-method-paths.ts",
+    "codegen": "npm run gen-proto && npm run gen-method-paths"
   },
   "repository": {
     "type": "git",
