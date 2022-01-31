@@ -1,4 +1,5 @@
-import { Event, SubmitEventsRequest } from "./generated/sandbar"
+import * as narrow from "./generated/sandbar.narrow"
+import * as grpc from "./generated/sandbar"
 import { JsonValue } from "@protobuf-ts/runtime"
 import fetch from "cross-fetch"
 import methodPaths from "./generated/method-paths"
@@ -16,11 +17,11 @@ class Sandbar {
     }
   ) {}
 
-  async submitEvents(events: Event[]) {
-    const req: SubmitEventsRequest = {
+  async submitEvents(events: narrow.Event[]) {
+    const req: narrow.SubmitEventsRequest = {
       events,
     }
-    const json = SubmitEventsRequest.toJson(req)
+    const json = grpc.SubmitEventsRequest.toJson(req)
     const path = methodPaths.SubmitEvents
     await this.post(path, json)
   }

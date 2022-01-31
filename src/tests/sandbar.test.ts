@@ -27,6 +27,12 @@ test("id string with numeric succeeds", async () => {
             oneofKind: "sandbarAccountId",
             sandbarAccountId: "123",
           },
+          entityId: {
+            entityId: {
+              oneofKind: "sandbarEntityId",
+              sandbarEntityId: "123",
+            },
+          },
           startDate: "lol",
         },
       },
@@ -48,6 +54,12 @@ test("id string with non-numeric fails", async () => {
             accountId: {
               oneofKind: "sandbarAccountId",
               sandbarAccountId: alphaId,
+            },
+            entityId: {
+              entityId: {
+                oneofKind: "sandbarEntityId",
+                sandbarEntityId: "123",
+              },
             },
             startDate: "lol",
           },

@@ -3,7 +3,7 @@ import { SandbarDataService } from "../generated/sandbar"
 import { HttpRule } from "../generated/google/api/http"
 import { readMethodOption } from "@protobuf-ts/runtime-rpc"
 import path from "path"
-import { Readable, Writable, pipeline } from "stream"
+import { Readable, pipeline } from "stream"
 import fs from "fs"
 import { promisify } from "util"
 const pipelineAsync = promisify(pipeline)
