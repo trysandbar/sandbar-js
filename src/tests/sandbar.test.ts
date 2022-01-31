@@ -1,7 +1,7 @@
 import fetchMock from "jest-fetch-mock"
 jest.setMock("cross-fetch", fetchMock)
 
-import * as sandbar from "../generated/sandbar.narrow"
+import * as sandbar from "../generated/sandbar"
 import { Sandbar } from ".."
 
 beforeEach(() => {

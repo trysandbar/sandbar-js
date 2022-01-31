@@ -1,6 +1,6 @@
 #!/usr/bin/env ts-node-script
-import { SandbarDataService } from "../generated/sandbar"
-import { HttpRule } from "../generated/google/api/http"
+import { SandbarDataService } from "../generated/private/sandbar"
+import { HttpRule } from "../generated/private/google/api/http"
 import { readMethodOption } from "@protobuf-ts/runtime-rpc"
 import path from "path"
 import { Readable, pipeline } from "stream"
@@ -63,7 +63,7 @@ function httpPathsAsTypescript(
 
 async function main() {
   const repoRoot = path.resolve(path.join(__dirname, "../.."))
-  const outPath = path.join(repoRoot, "src/generated/method-paths.ts")
+  const outPath = path.join(repoRoot, "src/generated/private/method-paths.ts")
   const outStream = fs.createWriteStream(outPath, "utf8")
   const paths = getHttpPaths()
   const readStream = httpPathsAsTypescript(paths, repoRoot)

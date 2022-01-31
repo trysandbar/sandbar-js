@@ -92,7 +92,11 @@ function isNodeConfiguredForTransform(node: ts.Node) {
   return isNamePresentInConfig(interfaceName, propertyName)
 }
 
-function importForEnum(node: ts.EnumDeclaration, factory: ts.NodeFactory) {
+function importForEnum(
+  node: ts.EnumDeclaration,
+  factory: ts.NodeFactory,
+  importPath: string
+) {
   return factory.createImportDeclaration(
     undefined, // decorators
     undefined, // modifiers
@@ -108,7 +112,7 @@ function importForEnum(node: ts.EnumDeclaration, factory: ts.NodeFactory) {
         ),
       ])
     ),
-    factory.createStringLiteral("./sandbar") // module specifier
+    factory.createStringLiteral(importPath) // module specifier
   )
 }
 
@@ -260,40 +264,47 @@ function isOneofUnionUndefinedTypeNode(node: ts.TypeNode): boolean {
   return true
 }
 
-const transformerFactory: ts.TransformerFactory<ts.SourceFile> = (context) => {
-  const { factory } = context
-  const visitor: ts.Visitor = (node) => {
-    if (!ts.isSourceFile(node) && ts.isSourceFile(node.parent)) {
-      // convert all top-level enum declarations to imports
-      if (ts.isEnumDeclaration(node)) {
-        return [importForEnum(node, factory), exportForEum(node, factory)]
+function getTransformerFactory(
+  importPath: string
+): ts.TransformerFactory<ts.SourceFile> {
+  return (context) => {
+    const { factory } = context
+    const visitor: ts.Visitor = (node) => {
+      if (!ts.isSourceFile(node) && ts.isSourceFile(node.parent)) {
+        // convert all top-level enum declarations to imports
+        if (ts.isEnumDeclaration(node)) {
+          return [
+            importForEnum(node, factory, importPath),
+            exportForEum(node, factory),
+          ]
+        }
+
+        // remove all remaining top-level nodes except interface declarations
+        if (!ts.isInterfaceDeclaration(node)) {
+          return
+        }
       }
 
-      // remove all remaining top-level nodes except interface declarations
-      if (!ts.isInterfaceDeclaration(node)) {
+      if (ts.isTypeNode(node) && isOneofUnionUndefinedTypeNode(node)) {
+        // oneof unions
         return
+      } else if (
+        ts.isPropertySignature(node) &&
+        isNodeConfiguredForTransform(node)
+      ) {
+        // message fields that should be required
+        const transformResult = transformMessageFieldToRequired(node, factory)
+        if (transformResult !== undefined) {
+          return transformResult
+        }
       }
+
+      return ts.visitEachChild(node, visitor, context)
     }
 
-    if (ts.isTypeNode(node) && isOneofUnionUndefinedTypeNode(node)) {
-      // oneof unions
-      return
-    } else if (
-      ts.isPropertySignature(node) &&
-      isNodeConfiguredForTransform(node)
-    ) {
-      // message fields that should be required
-      const transformResult = transformMessageFieldToRequired(node, factory)
-      if (transformResult !== undefined) {
-        return transformResult
-      }
+    return (sourceFile) => {
+      return ts.visitNode(sourceFile, visitor)
     }
-
-    return ts.visitEachChild(node, visitor, context)
-  }
-
-  return (sourceFile) => {
-    return ts.visitNode(sourceFile, visitor)
   }
 }
 
@@ -301,11 +312,12 @@ async function main() {
   const generatedDir = "src/generated"
   const src = ts.createSourceFile(
     "sandbar.ts",
-    await fs.readFile(path.join(generatedDir, "sandbar.ts"), "utf8"),
+    await fs.readFile(path.join(generatedDir, "private/sandbar.ts"), "utf8"),
     ts.ScriptTarget.ES2021,
     true
   )
 
+  const transformerFactory = getTransformerFactory("./private/sandbar")
   const result = ts.transform(src, [transformerFactory])
   const files = result.transformed
   if (files.length > 1) {
@@ -315,7 +327,7 @@ async function main() {
   const printer = ts.createPrinter()
   const file = files[0]
   await fs.writeFile(
-    path.join(generatedDir, "sandbar.narrow.ts"),
+    path.join(generatedDir, "sandbar.ts"),
     printer.printFile(file)
   )
 }

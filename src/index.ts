@@ -1,8 +1,8 @@
-import * as narrow from "./generated/sandbar.narrow"
-import * as grpc from "./generated/sandbar"
+import * as publicapi from "./generated/sandbar"
+import * as grpc from "./generated/private/sandbar"
 import { JsonValue } from "@protobuf-ts/runtime"
 import fetch from "cross-fetch"
-import methodPaths from "./generated/method-paths"
+import methodPaths from "./generated/private/method-paths"
 
 function base64encode(input: string) {
   Buffer.from(input, "utf8").toString("base64")
@@ -17,8 +17,8 @@ class Sandbar {
     }
   ) {}
 
-  async submitEvents(events: narrow.Event[]) {
-    const req: narrow.SubmitEventsRequest = {
+  async submitEvents(events: publicapi.Event[]) {
+    const req: publicapi.SubmitEventsRequest = {
       events,
     }
     const json = grpc.SubmitEventsRequest.toJson(req)
