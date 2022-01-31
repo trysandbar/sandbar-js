@@ -1,15 +1,14 @@
 import fetchMock from "jest-fetch-mock"
 jest.setMock("cross-fetch", fetchMock)
 
-import * as sandbar from "../generated/sandbar"
-import { Sandbar } from ".."
+import * as sandbar from "../"
 
 beforeEach(() => {
   fetchMock.resetMocks()
 })
 
 test("id string with numeric succeeds", async () => {
-  const api = new Sandbar()
+  const api = new sandbar.Client()
   fetchMock.mockIf(
     /https:\/\/api\.sandbar\.ai\/v0\/submit_event\/?/,
     async (_req) => {
@@ -41,7 +40,7 @@ test("id string with numeric succeeds", async () => {
 })
 
 test("id string with non-numeric fails", async () => {
-  const api = new Sandbar()
+  const api = new sandbar.Client()
   const alphaId = "abc"
   await expect(
     api.submitEvents([
