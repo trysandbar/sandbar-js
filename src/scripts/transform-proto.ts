@@ -112,6 +112,23 @@ function importForEnum(node: ts.EnumDeclaration, factory: ts.NodeFactory) {
   )
 }
 
+function exportForEum(node: ts.EnumDeclaration, factory: ts.NodeFactory) {
+  return factory.createExportDeclaration(
+    undefined, // decorators
+    undefined, // modifiers
+    false, // isTypeOnly
+    factory.createNamedExports([
+      factory.createExportSpecifier(
+        false, // isTypeOnly
+        undefined, // propertyName
+        node.name // name
+      ),
+    ]),
+    undefined, // moduleSpecifier
+    undefined // assertClause
+  )
+}
+
 /**
  * transforms message field to be required,
  * or undefined if the node is detected to not be a message field.
@@ -249,7 +266,7 @@ const transformerFactory: ts.TransformerFactory<ts.SourceFile> = (context) => {
     if (!ts.isSourceFile(node) && ts.isSourceFile(node.parent)) {
       // convert all top-level enum declarations to imports
       if (ts.isEnumDeclaration(node)) {
-        return importForEnum(node, factory)
+        return [importForEnum(node, factory), exportForEum(node, factory)]
       }
 
       // remove all remaining top-level nodes except interface declarations

@@ -1,7 +1,7 @@
 import fetchMock from "jest-fetch-mock"
 jest.setMock("cross-fetch", fetchMock)
 
-import { EventType } from "../generated/sandbar"
+import * as sandbar from "../generated/sandbar.narrow"
 import { Sandbar } from ".."
 
 beforeEach(() => {
@@ -9,16 +9,16 @@ beforeEach(() => {
 })
 
 test("id string with numeric succeeds", async () => {
-  const sandbar = new Sandbar()
+  const api = new Sandbar()
   fetchMock.mockIf(
     /https:\/\/api\.sandbar\.ai\/v0\/submit_event\/?/,
     async (_req) => {
       return JSON.stringify({ status: "success" })
     }
   )
-  await sandbar.submitEvents([
+  await api.submitEvents([
     {
-      type: EventType.CREATE,
+      type: sandbar.EventType.CREATE,
       incomplete: false,
       payload: {
         oneofKind: "accountEntityLink",
@@ -41,12 +41,12 @@ test("id string with numeric succeeds", async () => {
 })
 
 test("id string with non-numeric fails", async () => {
-  const sandbar = new Sandbar()
+  const api = new Sandbar()
   const alphaId = "abc"
   await expect(
-    sandbar.submitEvents([
+    api.submitEvents([
       {
-        type: EventType.CREATE,
+        type: sandbar.EventType.CREATE,
         incomplete: false,
         payload: {
           oneofKind: "accountEntityLink",
