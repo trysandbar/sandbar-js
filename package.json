@@ -7,7 +7,10 @@
     "test": "jest",
     "lint": "yamllint",
     "fmt": "prettier",
-    "proto": "./scripts/generate.ts"
+    "gen-proto": "./src/scripts/generate-proto.ts --googleapis ../googleapis",
+    "transform-proto": "./src/scripts/transform-proto.ts",
+    "gen-method-paths": "./src/scripts/generate-method-paths.ts",
+    "codegen": "npm run gen-proto && npm run gen-method-paths && npm run transform-proto"
   },
   "repository": {
     "type": "git",
@@ -31,10 +34,15 @@
     "commander": "^8.3.0",
     "jest": "^27.4.7",
     "jest-extended": "^1.2.0",
+    "jest-fetch-mock": "^3.0.3",
+    "prettier": "^2.5.1",
     "ts-jest": "^27.1.3",
-    "ts-node": "^10.4.0"
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.5"
   },
   "dependencies": {
-    "long": "^5.2.0"
+    "cross-fetch": "^3.1.5",
+    "long": "^5.2.0",
+    "node-fetch": "^3.2.0"
   }
 }
