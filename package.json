@@ -1,6 +1,6 @@
 {
   "name": "sandbar",
-  "version": "0.0.0",
+  "version": "0.1.0-alpha.1",
   "description": "client library for sandbar",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,8 @@
     "gen-proto": "./src/scripts/generate-proto.ts --googleapis ../googleapis",
     "transform-proto": "./src/scripts/transform-proto.ts",
     "gen-method-paths": "./src/scripts/generate-method-paths.ts",
-    "codegen": "npm run gen-proto && npm run gen-method-paths && npm run transform-proto"
+    "codegen": "npm run gen-proto && npm run gen-method-paths && npm run transform-proto",
+    "clean": "rm -rf dist && rm -rf src/generated"
   },
   "repository": {
     "type": "git",
