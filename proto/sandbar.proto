@@ -159,6 +159,8 @@ message EventResponse {
   string message = 4;
   // In the event that there is an incomplete item, this is the sandbar-generated ID for the object.
   string generated_id = 5;
+  // Specifies the type of payload that this message is in response to
+  EventResponseType event_response_type = 6;
 }
 
 // Response from a call to submit events endpoint.
@@ -833,5 +835,13 @@ enum AddressType {
   ADDRESS_TYPE_MILITARY = 4;
   // Another address type not enumerated here.
   ADDRESS_TYPE_OTHER = 100;
+}
 
+// Specifies the type of payload that this message is in response to
+enum EventResponseType {
+  EVENT_RESPONSE_TYPE_UNSPECIFIED = 0;
+  EVENT_RESPONSE_TYPE_ENTITY = 1;
+  EVENT_RESPONSE_TYPE_ACCOUNT = 2;
+  EVENT_RESPONSE_TYPE_ACCOUNT_ENTITY_LINK = 3;
+  EVENT_RESPONSE_TYPE_TRANSACTION = 4;
 }
