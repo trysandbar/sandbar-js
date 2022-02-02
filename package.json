@@ -1,27 +1,36 @@
 {
   "name": "sandbar",
-  "version": "0.0.0",
+  "version": "0.1.0-alpha.1",
   "description": "client library for sandbar",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "lint": "yamllint",
     "fmt": "prettier",
+    "dist": "npm run codegen && tsc --project tsconfig.dist.json",
     "gen-proto": "./src/scripts/generate-proto.ts --googleapis ../googleapis",
     "transform-proto": "./src/scripts/transform-proto.ts",
     "gen-method-paths": "./src/scripts/generate-method-paths.ts",
-    "codegen": "npm run gen-proto && npm run gen-method-paths && npm run transform-proto"
+    "codegen": "npm run gen-proto && npm run gen-method-paths && npm run transform-proto",
+    "clean": "rm -rf dist && rm -rf src/generated"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/trysandbar/sandbar-js.git"
   },
   "author": {
-    "name": "Ryan Rhee",
-    "email": "ryan@sandbar.ai",
-    "url": "https://github.com/ryanrhee"
+    "name": "Sandbar",
+    "email": "api-support@sandbar.ai",
+    "url": "https://github.com/trysandbar"
   },
-  "contributors": [],
+  "contributors": [
+    {
+      "name": "Ryan Rhee",
+      "email": "ryan@sandbar.ai",
+      "url": "https://github.com/ryanrhee"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/trysandbar/sandbar-js/issues"

@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "outDir": "dist"
+  },
+  "extends": "./tsconfig",
+  "include": ["./src/**/*.ts"],
+  "exclude": [
+    "./src/tests/**/*",
+    "./src/**/*.test.ts",
+    "./src/scripts/**/*",
+    "./src/generated/private/google/**/*"
+  ]
+}
