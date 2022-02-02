@@ -179,16 +179,26 @@ message SubmitEventsResponse {
 // company, or other thing that is potentially able to be an owner of an account.
 message Entity {
   // The sandbar ID of the given entity.
+  // This should not be set on events submitted to sandbar for `OPERATION_TYPE_CREATE`.
+  // Guaranteed to be present in the response.
   optional int64 sandbar_entity_id = 1;
   // The ID of the entity in the source system.
+  // Required for events submitted to sandbar.
+  // Guaranteed to be present in the response if the entity is not generated.
   optional string source_entity_id = 2;
   // The date the relationship between this entity and the institution began.
   optional string relationship_begin_date = 3;
   // Name of the entity.
+  // Required for events submitted to sandbar.
+  // Guaranteed to be present in the response if the entity is not generated.
   optional string name = 4;
   // If a person, this field contains their birthdate. If a company, the field contains the incorporation date of the entity.
+  // Required for events submitted to sandbar.
+  // Guaranteed to be present in the response if the entity is not generated.
   optional string birth_incorporation_date = 5;
   // The primary address of the entity. For a business, to better assess risk, using a registration address, or a P.O. box gives less information than a headquarters, or a place of operation.
+  // Required for events submitted to sandbar.
+  // Guaranteed to be present in the response if the entity is not generated.
   optional Address primary_address = 6;
   // Best email address to reach a client at.
   optional string email = 7;
@@ -196,11 +206,15 @@ message Entity {
   optional string tax_id = 8;
   // Employer ID Number.
   optional string ein = 9;
-  // For a business, the NAIC code of the industry they operate in. A full list of NAIC classifications and descriptions can be found at https://www.census.gov/naics/2017NAICS/2017_Definition_File.pdf.
+  // For a business, the NAIC code of the industry they operate in.
+  // A full list of NAIC classifications and descriptions can be found at https://www.census.gov/naics/2017NAICS/2017_Definition_File.pdf.
   optional string naic_code = 10;
   // For a business, the website they use to operate.
   optional string website_url = 11;
-  // In the event that we are working with an incomplete entity, this generated ID may be used. This field should not be set upon creation. Sandbar will create this id on the callers behalf.
+  // In the event that we are working with an incomplete entity, this generated ID may be used. This field should not be set upon creation.
+  // Sandbar will create this id on the callers behalf.
+  // This should not be set on events submitted to sandbar for `OPERATION_TYPE_CREATE` if the `event.incomplete` is set to `true`.
+  // Guaranteed to be present in the response if the entity is generated.
   optional string generated_entity_id = 12;
 }
 
