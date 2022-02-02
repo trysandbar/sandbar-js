@@ -8,7 +8,7 @@
     "test": "jest",
     "lint": "yamllint",
     "fmt": "prettier",
-    "dist": "tsc --project tsconfig.dist.json",
+    "dist": "npm run codegen && tsc --project tsconfig.dist.json",
     "gen-proto": "./src/scripts/generate-proto.ts --googleapis ../googleapis",
     "transform-proto": "./src/scripts/transform-proto.ts",
     "gen-method-paths": "./src/scripts/generate-method-paths.ts",
