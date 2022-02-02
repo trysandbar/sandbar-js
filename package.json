@@ -2,11 +2,13 @@
   "name": "sandbar",
   "version": "0.0.0",
   "description": "client library for sandbar",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "lint": "yamllint",
     "fmt": "prettier",
+    "dist": "tsc --project tsconfig.dist.json",
     "gen-proto": "./src/scripts/generate-proto.ts --googleapis ../googleapis",
     "transform-proto": "./src/scripts/transform-proto.ts",
     "gen-method-paths": "./src/scripts/generate-method-paths.ts",
@@ -17,11 +19,17 @@
     "url": "git+https://github.com/trysandbar/sandbar-js.git"
   },
   "author": {
-    "name": "Ryan Rhee",
-    "email": "ryan@sandbar.ai",
-    "url": "https://github.com/ryanrhee"
+    "name": "Sandbar",
+    "email": "api-support@sandbar.ai",
+    "url": "https://github.com/trysandbar"
   },
-  "contributors": [],
+  "contributors": [
+    {
+      "name": "Ryan Rhee",
+      "email": "ryan@sandbar.ai",
+      "url": "https://github.com/ryanrhee"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/trysandbar/sandbar-js/issues"
