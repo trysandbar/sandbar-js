@@ -2,37 +2,27 @@ import * as publicapi from "./generated/sandbar"
 import * as grpc from "./generated/private/sandbar"
 import fetch from "cross-fetch"
 import methodPaths from "./generated/private/method-paths"
+import {
+  EventResponse,
+  translateEventResponse,
+} from "./translators/translate-event-response"
+import {
+  Entity,
+  translateEntityResponse,
+} from "./translators/translate-entity-response"
 
 function base64encode(input: string) {
   Buffer.from(input, "utf8").toString("base64")
 }
 
-type EventResponse = {
-  sandbarId: string
-  isSuccessful: boolean
-  message: string
-} & (
-  | {
-      responseType: "entity"
-      sourceEntityId: string
-      generatedId: string
-    }
-  | {
-      responseType: "account"
-      sourceAccountId: publicapi.AccountIdentifier
-    }
-  | {
-      responseType: "accountEntityLink"
-    }
-  | {
-      responseType: "transaction"
-      sourceTransactionId: string
-    }
-)
-
 interface SubmitEventsResponse {
   message: string
   responses: EventResponse[]
+}
+
+interface GetEntityResponse {
+  message: string
+  entities: Entity[]
 }
 
 class Client {
@@ -51,12 +41,32 @@ class Client {
     const json = grpc.SubmitEventsRequest.toJsonString(req)
     const path = methodPaths.SubmitEvents
     const response = await this.post(path, json)
-    const parsedResponse = grpc.SubmitEventsResponse.fromJsonString(response)
-    const { message, responses: grpcResponses } = parsedResponse
-    const responses = grpcResponses.map(translateResponse)
+    const { message, responses: grpcResponses } =
+      grpc.SubmitEventsResponse.fromJsonString(response)
+    const responses = grpcResponses.map(translateEventResponse)
     return {
       message,
       responses,
+    }
+  }
+
+  async getEntity(
+    entityId: publicapi.EntityQueryIdParam["entityId"]
+  ): Promise<GetEntityResponse> {
+    const req: publicapi.GetEntityRequest = {
+      request: {
+        id: { entityId },
+      },
+    }
+    const json = grpc.GetEntityRequest.toJsonString(req)
+    const path = methodPaths.GetEntity
+    const response = await this.post(path, json)
+    const { message, entity: grpcEntities } =
+      grpc.GetEntityResponse.fromJsonString(response)
+    const entities = grpcEntities.map(translateEntityResponse)
+    return {
+      message,
+      entities,
     }
   }
 
@@ -89,58 +99,4 @@ class Client {
   }
 }
 
-function translateResponse(response: grpc.EventResponse): EventResponse {
-  const {
-    sourceId,
-    isSuccessful,
-    sandbarId,
-    message,
-    generatedId,
-    eventResponseType,
-  } = response
-  switch (eventResponseType) {
-    case publicapi.EventResponseType.ENTITY:
-      return {
-        responseType: "entity",
-        sourceEntityId: sourceId,
-        isSuccessful,
-        sandbarId,
-        message,
-        generatedId,
-      }
-    case publicapi.EventResponseType.ACCOUNT: {
-      const [bankName, accountNumber] = sourceId.split("|", 2)
-      return {
-        responseType: "account",
-        sourceAccountId: {
-          bankName,
-          accountNumber,
-        },
-        isSuccessful,
-        sandbarId,
-        message,
-      }
-    }
-    case publicapi.EventResponseType.ACCOUNT_ENTITY_LINK:
-      return {
-        responseType: "accountEntityLink",
-        isSuccessful,
-        sandbarId,
-        message,
-      }
-    case publicapi.EventResponseType.TRANSACTION:
-      return {
-        responseType: "transaction",
-        sourceTransactionId: sourceId,
-        isSuccessful,
-        sandbarId,
-        message,
-      }
-    case publicapi.EventResponseType.UNSPECIFIED:
-      throw new TypeError(
-        "API contract violation: event response type unspecified"
-      )
-  }
-}
-
-export { Client, EventResponse, SubmitEventsResponse }
+export { Client, SubmitEventsResponse, GetEntityResponse }
