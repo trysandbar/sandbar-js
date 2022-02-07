@@ -12,6 +12,7 @@ import {
 import { translateAccount } from "./translators/translate-account"
 import { translateTransaction } from "./translators/translate-transaction"
 import { IMessageType } from "@protobuf-ts/runtime"
+import { translateInvestigation } from "./translators/translate-investigation"
 
 function base64encode(input: string) {
   Buffer.from(input, "utf8").toString("base64")
@@ -102,6 +103,18 @@ class Client {
     const transactions = grpcTransactions.map(translateTransaction)
     return {
       transactions,
+      message,
+    }
+  }
+
+  async getAllInvestigations(
+    options: publicapi.GetAllInvestigationsRequest_Options
+  ): Promise<publicapi.GetAllInvestigationsResponse> {
+    const { investigations: grpcInvestigations, message } =
+      await this.callMethod(methods.GetAllInvestigations, { options })
+    const investigations = grpcInvestigations.map(translateInvestigation)
+    return {
+      investigations,
       message,
     }
   }
