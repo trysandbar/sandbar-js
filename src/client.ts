@@ -11,6 +11,7 @@ import {
   translateEntityResponse,
 } from "./translators/translate-entity-response"
 import { translateAccount } from "./translators/translate-account"
+import { translateTransaction } from "./translators/translate-transaction"
 
 function base64encode(input: string) {
   Buffer.from(input, "utf8").toString("base64")
@@ -86,6 +87,24 @@ class Client {
     return {
       message,
       accounts,
+    }
+  }
+
+  async getTransactionsForAccount(
+    entityId: publicapi.EntityQueryIdParam["entityId"]
+  ): Promise<publicapi.GetTransactionsForEntityResponse> {
+    const req: publicapi.GetTransactionsForEntityRequest = {
+      id: { entityId },
+    }
+    const json = grpc.GetTransactionsForEntityRequest.toJsonString(req)
+    const path = methodPaths.GetTransactionsForEntity
+    const response = await this.post(path, json)
+    const { transactions: grpcTransactions, message } =
+      grpc.GetTransactionsForEntityResponse.fromJsonString(response)
+    const transactions = grpcTransactions.map(translateTransaction)
+    return {
+      transactions,
+      message,
     }
   }
 
