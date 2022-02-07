@@ -10,6 +10,7 @@ import {
   Entity,
   translateEntityResponse,
 } from "./translators/translate-entity-response"
+import { translateAccount } from "./translators/translate-account"
 
 function base64encode(input: string) {
   Buffer.from(input, "utf8").toString("base64")
@@ -50,12 +51,12 @@ class Client {
     }
   }
 
-  async getEntity(
-    entityId: publicapi.EntityQueryIdParam["entityId"]
+  async getEntities(
+    entityIds: publicapi.EntityQueryIdParam["entityId"][]
   ): Promise<GetEntityResponse> {
     const req: publicapi.GetEntityRequest = {
       request: {
-        id: { entityId },
+        ids: entityIds.map((entityId) => ({ entityId })),
       },
     }
     const json = grpc.GetEntityRequest.toJsonString(req)
@@ -67,6 +68,24 @@ class Client {
     return {
       message,
       entities,
+    }
+  }
+
+  async getAccounts(
+    accountIds: publicapi.AccountQueryIdParam["id"][]
+  ): Promise<publicapi.GetAccountResponse> {
+    const req: publicapi.GetAccountRequest = {
+      id: accountIds.map((id) => ({ id })),
+    }
+    const json = grpc.GetAccountRequest.toJsonString(req)
+    const path = methodPaths.GetAccount
+    const response = await this.post(path, json)
+    const { message, accounts: grpcAccounts } =
+      grpc.GetAccountResponse.fromJsonString(response)
+    const accounts = grpcAccounts.map(translateAccount)
+    return {
+      message,
+      accounts,
     }
   }
 

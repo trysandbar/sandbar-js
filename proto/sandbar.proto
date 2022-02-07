@@ -221,7 +221,7 @@ message Entity {
 // Query containing entity information.
 message EntityQuery {
   // A parameter containing information needed to identify an entity.
-  EntityQueryIdParam id = 1;
+  repeated EntityQueryIdParam ids = 1;
   reserved 2, 3;
   reserved "knowledge_date", "effective_date";
 }
@@ -229,7 +229,7 @@ message EntityQuery {
 // A request containing information necessary to get rule outputs for a given entity.
 message GetRuleOutputForEntitiesRequest {
   // Specifies which entities to request for rule outputs for.
-  repeated EntityQuery requests = 1;
+  EntityQuery request = 1;
 }
 
 // A request containing information necessary to get a given entity.
@@ -275,14 +275,18 @@ message Account {
   optional string account_close_date = 7;
 }
 
-// The request sent when trying to get a specific account from sandbar.
-message GetAccountRequest {
+message AccountQueryIdParam {
   oneof id {
     // A sandbar ID for a given account.
     int64 sandbar_account_id = 1;
     // The information used to uniquely identify an account at a given point in time.
     AccountIdentifier account_identifier = 2;
   }
+}
+
+// The request sent when trying to get a specific account from sandbar.
+message GetAccountRequest {
+  repeated AccountQueryIdParam id = 1;
   reserved 3, 4;
   reserved "knowledge_date", "effective_date";
 }
@@ -334,7 +338,7 @@ enum AccountType {
 // A request payload that allows a user to get a set of accounts for a given entity.
 message GetAccountsForEntityRequest {
   // Information about the entity qe are trying to get accounts for.
-  EntityQuery request = 1;
+  EntityQueryIdParam id = 1;
 }
 
 // A response payload that contains information about a set of accounts owned by a single entity.
@@ -434,7 +438,7 @@ message GetTransactionsForEntityResponse {
 // A request that allows a user to get all the transactions associated with a given entity.
 message GetTransactionsForEntityRequest {
   // Specifies the entity to request information on.
-  EntityQuery request = 1;
+  EntityQueryIdParam id = 1;
 }
 
 /* RULE OUTPUT */
@@ -478,7 +482,7 @@ message GetRuleOutputForEntitiesResponse {
 // A request payload that contains entity information used to get rule output history for that entity.
 message GetRuleOutputHistoryForEntityRequest {
   // Specifies the entity to request information on.
-  EntityQuery request = 1;
+  EntityQueryIdParam id = 1;
 }
 
 // A message containing a history of rule outputs for a given entity.
