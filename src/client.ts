@@ -90,7 +90,7 @@ class Client {
     }
   }
 
-  async getTransactionsForAccount(
+  async getTransactionsForEntity(
     entityId: publicapi.EntityQueryIdParam["entityId"]
   ): Promise<publicapi.GetTransactionsForEntityResponse> {
     const req: publicapi.GetTransactionsForEntityRequest = {
