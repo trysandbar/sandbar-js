@@ -18,14 +18,6 @@ export type Entity =
   | ({ isGenerated: true } & publicapi.Entity)
 
 export function translateEntityResponse(entityGrpc: grpc.Entity): Entity {
-  const {
-    sandbarEntityId,
-    sourceEntityId,
-    relationshipBeginDate,
-    name,
-    birthIncorporationDate,
-  } = entityGrpc
-
   const isGenerated = !isCompleteEntity(entityGrpc)
   return isGenerated
     ? { isGenerated, ...entityGrpc }
