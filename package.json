@@ -11,8 +11,8 @@
     "dist": "npm run codegen && tsc --project tsconfig.dist.json",
     "gen-proto": "./src/scripts/generate-proto.ts --googleapis ../googleapis",
     "transform-proto": "./src/scripts/transform-proto.ts",
-    "gen-method-paths": "./src/scripts/generate-method-paths.ts",
-    "codegen": "npm run gen-proto && npm run gen-method-paths && npm run transform-proto",
+    "gen-method-sigs": "./src/scripts/generate-method-signatures.ts",
+    "codegen": "npm run gen-proto && npm run gen-method-sigs && npm run transform-proto",
     "clean": "rm -rf dist && rm -rf src/generated"
   },
   "repository": {

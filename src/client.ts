@@ -1,7 +1,6 @@
 import * as publicapi from "./generated/sandbar"
-import * as grpc from "./generated/private/sandbar"
 import fetch from "cross-fetch"
-import methodPaths from "./generated/private/method-paths"
+import methods from "./generated/private/methods"
 import {
   EventResponse,
   translateEventResponse,
@@ -12,6 +11,7 @@ import {
 } from "./translators/translate-entity-response"
 import { translateAccount } from "./translators/translate-account"
 import { translateTransaction } from "./translators/translate-transaction"
+import { IMessageType } from "@protobuf-ts/runtime"
 
 function base64encode(input: string) {
   Buffer.from(input, "utf8").toString("base64")
@@ -27,6 +27,12 @@ interface GetEntityResponse {
   entities: Entity[]
 }
 
+type Method<I extends object, O extends object> = {
+  path: string
+  input: IMessageType<I>
+  output: IMessageType<O>
+}
+
 class Client {
   constructor(
     private base = "https://api.sandbar.ai",
@@ -37,14 +43,12 @@ class Client {
   ) {}
 
   async submitEvents(events: publicapi.Event[]): Promise<SubmitEventsResponse> {
-    const req: publicapi.SubmitEventsRequest = {
-      events,
-    }
-    const json = grpc.SubmitEventsRequest.toJsonString(req)
-    const path = methodPaths.SubmitEvents
-    const response = await this.post(path, json)
-    const { message, responses: grpcResponses } =
-      grpc.SubmitEventsResponse.fromJsonString(response)
+    const { message, responses: grpcResponses } = await this.callMethod(
+      methods.SubmitEvents,
+      {
+        events,
+      }
+    )
     const responses = grpcResponses.map(translateEventResponse)
     return {
       message,
@@ -55,16 +59,14 @@ class Client {
   async getEntities(
     entityIds: publicapi.EntityQueryIdParam["entityId"][]
   ): Promise<GetEntityResponse> {
-    const req: publicapi.GetEntityRequest = {
-      request: {
-        ids: entityIds.map((entityId) => ({ entityId })),
-      },
-    }
-    const json = grpc.GetEntityRequest.toJsonString(req)
-    const path = methodPaths.GetEntity
-    const response = await this.post(path, json)
-    const { message, entity: grpcEntities } =
-      grpc.GetEntityResponse.fromJsonString(response)
+    const { message, entity: grpcEntities } = await this.callMethod(
+      methods.GetEntity,
+      {
+        request: {
+          ids: entityIds.map((entityId) => ({ entityId })),
+        },
+      }
+    )
     const entities = grpcEntities.map(translateEntityResponse)
     return {
       message,
@@ -75,14 +77,12 @@ class Client {
   async getAccounts(
     accountIds: publicapi.AccountQueryIdParam["id"][]
   ): Promise<publicapi.GetAccountResponse> {
-    const req: publicapi.GetAccountRequest = {
-      id: accountIds.map((id) => ({ id })),
-    }
-    const json = grpc.GetAccountRequest.toJsonString(req)
-    const path = methodPaths.GetAccount
-    const response = await this.post(path, json)
-    const { message, accounts: grpcAccounts } =
-      grpc.GetAccountResponse.fromJsonString(response)
+    const { message, accounts: grpcAccounts } = await this.callMethod(
+      methods.GetAccount,
+      {
+        id: accountIds.map((id) => ({ id })),
+      }
+    )
     const accounts = grpcAccounts.map(translateAccount)
     return {
       message,
@@ -93,19 +93,26 @@ class Client {
   async getTransactionsForEntity(
     entityId: publicapi.EntityQueryIdParam["entityId"]
   ): Promise<publicapi.GetTransactionsForEntityResponse> {
-    const req: publicapi.GetTransactionsForEntityRequest = {
-      id: { entityId },
-    }
-    const json = grpc.GetTransactionsForEntityRequest.toJsonString(req)
-    const path = methodPaths.GetTransactionsForEntity
-    const response = await this.post(path, json)
-    const { transactions: grpcTransactions, message } =
-      grpc.GetTransactionsForEntityResponse.fromJsonString(response)
+    const { transactions: grpcTransactions, message } = await this.callMethod(
+      methods.GetTransactionsForEntity,
+      {
+        id: { entityId },
+      }
+    )
     const transactions = grpcTransactions.map(translateTransaction)
     return {
       transactions,
       message,
     }
+  }
+
+  private async callMethod<I extends object, O extends object>(
+    { path, input, output }: Method<I, O>,
+    req: I
+  ): Promise<O> {
+    const json = input.toJsonString(req)
+    const response = await this.post(path, json)
+    return output.fromJsonString(response)
   }
 
   private async post(path: string, body: string) {
