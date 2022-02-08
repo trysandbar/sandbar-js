@@ -18,9 +18,11 @@ jobs:
         with:
           repository: googleapis/googleapis
           path: googleapis
+      - name: Install pnpm
+        run: npm i -g pnpm
       - name: Install modules
-        run: npm i
+        run: pnpm i
       - name: Run codegen
-        run: npm run codegen
+        run: pnpm run codegen
       - name: Run tests
-        run: npm test
+        run: pnpm test

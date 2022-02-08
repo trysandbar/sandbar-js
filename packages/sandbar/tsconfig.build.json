@@ -1,9 +1,10 @@
 {
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "declaration": true,
-    "outDir": "dist"
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "tsBuildInfoFile": "../../.build-cache/sandbar.tsbuildinfo"
   },
-  "extends": "./tsconfig",
   "include": ["./src/**/*.ts"],
   "exclude": [
     "./src/tests/**/*",

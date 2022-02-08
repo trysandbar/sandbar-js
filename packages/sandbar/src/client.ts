@@ -1,6 +1,6 @@
 import * as publicapi from "./generated/sandbar"
 import fetch from "cross-fetch"
-import methods from "./generated/private/methods"
+import { methods } from "./generated/private/methods"
 import {
   EventResponse,
   translateEventResponse,
