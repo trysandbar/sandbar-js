@@ -18,8 +18,5 @@
     "forceConsistentCasingInFileNames": true,
     "strictNullChecks": true
   },
-  "ts-node": {
-    "transpileOnly": true
-  },
   "exclude": ["node_modules", "dist"]
 }
