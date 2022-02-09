@@ -158,6 +158,8 @@ class Client {
       Authorization: `Basic ${base64encode(`${username}:${password}`)}`,
     }
   }
+
+  private test() {}
 }
 
 export { Client, SubmitEventsResponse, GetEntityResponse }
