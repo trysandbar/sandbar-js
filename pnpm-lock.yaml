@@ -35,7 +35,10 @@ importers:
       typescript: 4.5.5
 
   examples/example-ts:
-    specifiers: {}
+    specifiers:
+      sandbar: 0.1.0-alpha.2
+    dependencies:
+      sandbar: link:../../packages/sandbar
 
   packages/sandbar:
     specifiers:
