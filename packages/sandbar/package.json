@@ -1,6 +1,6 @@
 {
   "name": "sandbar",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "description": "client library for sandbar",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

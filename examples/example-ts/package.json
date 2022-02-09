@@ -1,7 +1,7 @@
 {
   "name": "example-ts",
   "private": true,
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "description": "example usage of the sandbar client library in typescript",
   "scripts": {
     "test": "jest --passWithNoTests",
@@ -31,6 +31,6 @@
   },
   "homepage": "https://github.com/trysandbar/sandbar-js#readme",
   "dependencies": {
-    "sandbar": "0.1.0-alpha.2"
+    "sandbar": "^0.1.0-alpha.3"
   }
 }
