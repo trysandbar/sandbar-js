@@ -1,3 +1,4 @@
 dist/
 generated/
 pnpm-lock.yaml
+lerna.json
