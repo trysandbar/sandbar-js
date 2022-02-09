@@ -5,5 +5,8 @@
     "outDir": "./dist",
     "tsBuildInfoFile": "../../.build-cache/example-ts.tsbuildinfo"
   },
-  "include": ["./src"]
+  "include": ["./src"],
+  "references": [
+    { "path": "../../packages/sandbar/tsconfig.build.json", "prepend": false }
+  ]
 }
