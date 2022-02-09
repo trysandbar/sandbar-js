@@ -10,9 +10,9 @@ beforeEach(() => {
 })
 
 test("well-formed submit request succeeds", async () => {
-  const api = new sandbar.Client()
+  const api = new sandbar.Client("hello.dev")
   fetchMock.mockIf(
-    /https:\/\/api\.sandbar\.ai\/v0\/submit_event\/?/,
+    /https:\/\/hello\.dev\.sandbar\.ai\/v0\/submit_event\/?/,
     async (_req) => {
       return JSON.stringify({
         message: "success",
@@ -44,7 +44,7 @@ test("well-formed submit request succeeds", async () => {
 })
 
 test("id string with non-numeric fails", async () => {
-  const api = new sandbar.Client()
+  const api = new sandbar.Client("hello.dev")
   const alphaId = "abc"
   await expect(
     api.submitEvents([
@@ -114,12 +114,12 @@ test("creat new entities, accounts, links, and transaction", async () => {
     ],
   }
   fetchMock.mockIf(
-    /https:\/\/api\.sandbar\.ai\/v0\/submit_event\/?/,
+    /https:\/\/hello\.dev\.sandbar\.ai\/v0\/submit_event\/?/,
     async (_req) => {
       return JSON.stringify(resp)
     }
   )
-  const api = new sandbar.Client()
+  const api = new sandbar.Client("hello.dev")
   const result = await api.submitEvents([
     {
       type: sandbar.EventType.CREATE,

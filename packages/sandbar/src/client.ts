@@ -35,13 +35,16 @@ type Method<I extends object, O extends object> = {
 }
 
 class Client {
+  private base: string
   constructor(
-    private base = "https://api.sandbar.ai",
+    subdomain: string,
     private auth?: {
       username: string
       password: string
     }
-  ) {}
+  ) {
+    this.base = `https://${subdomain}.sandbar.ai`
+  }
 
   async submitEvents(events: publicapi.Event[]): Promise<SubmitEventsResponse> {
     const { message, responses: grpcResponses } = await this.callMethod(
