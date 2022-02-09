@@ -12,7 +12,7 @@
     "test": "lerna run test",
     "pub": "lerna publish",
     "fmt": "prettier -w .",
-    "version": "pre-commit run -a && lerna bootstrap --ignore-scripts -- --lockfile-only && git add pnpm-lock.yaml lerna.json"
+    "version": "pre-commit run -a; pre-commit run -a && lerna bootstrap --ignore-scripts -- --lockfile-only && git add pnpm-lock.yaml lerna.json"
   },
   "devDependencies": {
     "@protobuf-ts/plugin": "^2.2.2",
