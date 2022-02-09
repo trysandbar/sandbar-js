@@ -75,7 +75,7 @@ function methodImpls(
     out.push(`  ${output},\n`)
   }
   out.push(`} from "./sandbar"\n`)
-  out.push("export const methods = {\n")
+  out.push("export default {\n")
   for (const [key, { path, input, output }] of Object.entries(paths)) {
     out.push(`  "${key}": {\n`)
     out.push(`    path: "${path}",\n`)
