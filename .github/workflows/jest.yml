@@ -22,7 +22,7 @@ jobs:
         run: npm i -g pnpm
       - name: Install modules
         run: pnpm i
-      - name: Run codegen
-        run: pnpm run codegen
+      - name: Build (including codegen)
+        run: pnpm build
       - name: Run tests
         run: pnpm test
