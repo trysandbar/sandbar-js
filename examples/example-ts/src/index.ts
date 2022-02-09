@@ -1,7 +1,7 @@
 import * as sandbar from "sandbar"
 
 async function main() {
-  const client = new sandbar.Client()
+  const client = new sandbar.Client("hello.dev")
 
   // Send data to sandbar
   await client.submitEvents([
