@@ -159,6 +159,7 @@ class Client {
     }
   }
 
+  // added to trigger lerna change detection
   private test() {}
 }
 
