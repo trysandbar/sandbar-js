@@ -18,9 +18,15 @@ jobs:
         with:
           repository: googleapis/googleapis
           path: googleapis
+      - name: Install pnpm
+        run: npm i -g pnpm
       - name: Install modules
-        run: npm i
-      - name: Run codegen
-        run: npm run codegen
+        run: pnpm i
+      - name: Setup Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: "3.19.4"
+      - name: Build (including codegen)
+        run: pnpm build
       - name: Run tests
-        run: npm test
+        run: pnpm test

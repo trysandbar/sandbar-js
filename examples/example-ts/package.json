@@ -1,0 +1,36 @@
+{
+  "name": "example-ts",
+  "private": true,
+  "version": "0.1.0-alpha.2",
+  "description": "example usage of the sandbar client library in typescript",
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "fmt": "prettier",
+    "build": "tsc --build tsconfig.build.json",
+    "clean": "tsc --build tsconfig.build.json --clean"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trysandbar/sandbar-js.git"
+  },
+  "author": {
+    "name": "Sandbar",
+    "email": "api-support@sandbar.ai",
+    "url": "https://github.com/trysandbar"
+  },
+  "contributors": [
+    {
+      "name": "Ryan Rhee",
+      "email": "ryan@sandbar.ai",
+      "url": "https://github.com/ryanrhee"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/trysandbar/sandbar-js/issues"
+  },
+  "homepage": "https://github.com/trysandbar/sandbar-js#readme",
+  "dependencies": {
+    "sandbar": "0.1.0-alpha.2"
+  }
+}
