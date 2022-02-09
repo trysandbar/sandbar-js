@@ -4,7 +4,7 @@
   "version": "0.1.0-alpha.2",
   "description": "example usage of the sandbar client library in typescript",
   "scripts": {
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "fmt": "prettier",
     "build": "tsc --build tsconfig.build.json",
     "clean": "tsc --build tsconfig.build.json --clean"
