@@ -13,6 +13,20 @@ async function main() {
       },
       incomplete: false,
     },
+    {
+      type: sandbar.EventType.CREATE,
+      payload: {
+        oneofKind: "account",
+        account: {
+          accountType: sandbar.AccountType.CHECKING,
+          accountIdentifier: {
+            bankName: "Some Bank",
+            accountNumber: "12341234",
+          },
+        },
+      },
+      incomplete: false,
+    },
   ])
 }
 
