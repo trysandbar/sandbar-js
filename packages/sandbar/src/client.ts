@@ -158,6 +158,9 @@ class Client {
       Authorization: `Basic ${base64encode(`${username}:${password}`)}`,
     }
   }
+
+  // added to trigger lerna change detection
+  private test() {}
 }
 
 export { Client, SubmitEventsResponse, GetEntityResponse }

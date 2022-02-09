@@ -20,7 +20,17 @@ Ensure the version in the `package.json` is updated to what you want it to be.
 We should not overwrite an existing previous release with newer code.
 
 ```sh
-# in ./packages/sandbar
-npm adduser  # login as yourself
-npm publish
+# from repo root
+pnpm adduser   # login as yourself
+lerna publish  # tag the next release version and publish to npm
 ```
+
+If you already updated the version and pushed a tag, and just want to release:
+
+```sh
+lerna publish from-git
+```
+
+See the
+[`from-git` docs](https://github.com/lerna/lerna/tree/main/commands/publish#bump-from-git)
+for more info
