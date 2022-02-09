@@ -36,7 +36,7 @@ importers:
 
   examples/example-ts:
     specifiers:
-      sandbar: ^0.1.0-alpha.4
+      sandbar: ^0.1.0-alpha.5
     dependencies:
       sandbar: link:../../packages/sandbar
 
