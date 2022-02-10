@@ -1,6 +1,9 @@
 import * as publicapi from "../generated/sandbar"
 import * as grpc from "../generated/private/sandbar"
 
+/**
+ * Response for the event submitted to the sandbar API
+ */
 export type EventResponse = {
   sandbarId: string
   isSuccessful: boolean

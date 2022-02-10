@@ -43,13 +43,30 @@ type Event = Omit<publicapi.Event, "payload" | "incomplete" | "type"> &
       }
   )
 
-interface SubmitEventsResponse {
-  message: string
+/**
+ * Response from a call to submit events endpoint.
+ *
+ * Based on protobuf message sandbar.v0.SubmitEventsResponse
+ */
+export type SubmitEventsResponse = Omit<
+  publicapi.SubmitEventsResponse,
+  "responses"
+> & {
+  /**
+   * Collection of event responses
+   */
   responses: EventResponse[]
 }
 
-interface GetEntityResponse {
-  message: string
+/**
+ * A response containing requested entity information.
+ *
+ * Based on protobuf message sandbar.v0.GetEntityResponse
+ */
+export type GetEntityResponse = Omit<publicapi.GetEntityResponse, "entity"> & {
+  /**
+   * Collection of entity responses
+   */
   entities: Entity[]
 }
 
@@ -72,10 +89,20 @@ type Auth = {
   password: string
 }
 
-class Client {
+/**
+ * Sandbar client instance used to interact with the sandbar API.
+ */
+export class Client {
   private base: URL
   private auth: Auth | undefined
 
+  /**
+   * Instantiate a new instance of a sandbar client.
+   *
+   * @param options
+   * @param options.subdomain Subdomain of the sandbar API hostname, e.g. "mycompany" will send requests to "https://mycompany.sandbar.ai"
+   * @param options.url Full base URL of the sandbar API, e.g. "http://localhost:10000"
+   */
   constructor(
     options: {
       auth?: Auth
@@ -92,6 +119,15 @@ class Client {
     this.auth = auth
   }
 
+  /**
+   * This endpoint takes in events and processes them based on the metadata
+   * associated with them.
+   *
+   * Based on protobuf rpc: SubmitEvents
+   *
+   * @param events Events to send to the sandbar API
+   * @returns collection of results for each event received by API server
+   */
   async submitEvents(events: Event[]): Promise<SubmitEventsResponse> {
     const { message, responses: grpcResponses } = await this.callMethod(
       methods.SubmitEvents,
@@ -106,6 +142,14 @@ class Client {
     }
   }
 
+  /**
+   * This simple endpoint just takes in and returns entities.
+   *
+   * Based on protobuf rpc: GetEntity
+   *
+   * @param entityIds IDs of the entities to query for
+   * @returns Collection of entities specified by the parameter
+   */
   async getEntities(
     entityIds: publicapi.EntityQueryIdParam["entityId"][]
   ): Promise<GetEntityResponse> {
@@ -124,6 +168,12 @@ class Client {
     }
   }
 
+  /**
+   * This end point is used to get information about the given accounts.
+   *
+   * @param accountIds IDs of the accounts to query for
+   * @returns Collection of accounts specified by the parameter
+   */
   async getAccounts(
     accountIds: publicapi.AccountQueryIdParam["id"][]
   ): Promise<publicapi.GetAccountResponse> {
@@ -140,6 +190,14 @@ class Client {
     }
   }
 
+  /**
+   * This endpoint will return all the transactions for a given entity.
+   *
+   * Basede on protobuf rpc: GetTransactionsForEntity
+   *
+   * @param entityId ID of entity to get the transactions for
+   * @returns Collection of transactions associated with the given entity
+   */
   async getTransactionsForEntity(
     entityId: publicapi.EntityQueryIdParam["entityId"]
   ): Promise<publicapi.GetTransactionsForEntityResponse> {
@@ -156,6 +214,15 @@ class Client {
     }
   }
 
+  /**
+   * This query will return all investigations for an entity.
+   *
+   * Based on protobuf rpc: GetAllInvestigations
+   *
+   * @param options
+   * @param options.includeClosed If set to true, include closed investigations in the result. Defaults to false
+   * @returns Collection of investigations specified by the options
+   */
   async getAllInvestigations(
     options?: publicapi.GetAllInvestigationsRequest_Options
   ): Promise<publicapi.GetAllInvestigationsResponse> {
@@ -210,5 +277,3 @@ class Client {
     }
   }
 }
-
-export { Client, SubmitEventsResponse, GetEntityResponse }

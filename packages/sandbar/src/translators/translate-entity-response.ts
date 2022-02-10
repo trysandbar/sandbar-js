@@ -14,6 +14,9 @@ export type CompleteEntity = RequireKeys<
   "sandbarEntityId"
 >
 
+/**
+ * Entity returned by getEntities()
+ */
 export type Entity =
   | ({ isGenerated: false } & CompleteEntity)
   | ({ isGenerated: true } & publicapi.Entity)
