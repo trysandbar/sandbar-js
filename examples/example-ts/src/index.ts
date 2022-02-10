@@ -65,8 +65,6 @@ class Example {
 
     await this.getEntity("1")
 
-    // TODO: get accounts for entity
-
     const sendAcctRes = await this.client.submitEvents([
       {
         type: sandbar.EventType.CREATE,
@@ -87,8 +85,6 @@ class Example {
     console.log(
       `submit account response: ${JSON.stringify(sendAcctRes, undefined, 2)}`
     )
-
-    // TODO: get accounts for entity
 
     const sendLinkRes = await this.client.submitEvents([
       {
