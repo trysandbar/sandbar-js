@@ -230,12 +230,7 @@ class Example {
   }
 }
 
-async function main(client: sandbar.Client) {
-  const example = new Example(client)
-  await example.main()
-}
-
-if (require.main == module) {
+async function main() {
   program.option(
     "--url <url>",
     "base url of the api endpoint; " +
@@ -257,5 +252,10 @@ if (require.main == module) {
     program.help({ error: true })
   }
   const client = new sandbar.Client(specifier)
-  main(client)
+  const example = new Example(client)
+  await example.main()
+}
+
+if (require.main == module) {
+  main()
 }
