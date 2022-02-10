@@ -59,13 +59,27 @@ type Method<I extends object, O extends object> = {
   output: IMessageType<O>
 }
 
-type HostSpecifier =
+export type HostSpecifier =
   | {
       subdomain: string
     }
   | {
       url: string
     }
+
+export function toHostSpecifier({
+  subdomain,
+  url,
+}: {
+  subdomain?: string
+  url?: string
+}): HostSpecifier | undefined {
+  if (subdomain !== undefined && url === undefined) {
+    return { subdomain }
+  } else if (url !== undefined && subdomain === undefined) {
+    return { url }
+  }
+}
 
 type Auth = {
   username: string

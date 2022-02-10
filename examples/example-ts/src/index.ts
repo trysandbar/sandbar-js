@@ -1,5 +1,9 @@
+#!/usr/bin/env ts-node-script
+
 import * as sandbar from "sandbar"
 import humanizeDuration from "humanize-duration"
+import { program } from "commander"
+import { toHostSpecifier } from "sandbar/src/client"
 
 const snooze = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -226,11 +230,32 @@ class Example {
   }
 }
 
-async function main() {
-  const example = new Example()
+async function main(client: sandbar.Client) {
+  const example = new Example(client)
   await example.main()
 }
 
 if (require.main == module) {
-  main()
+  program.option(
+    "--url <url>",
+    "base url of the api endpoint; " +
+      "defaults to http://localhost:10000; " +
+      "only one of url or subdomain must be set"
+  )
+  program.option(
+    "--subdomain <subdomain>",
+    "subdomain of the sandbar api endpoint; " +
+      "only one of hostname or subdomain must be set"
+  )
+  program.parse(process.argv)
+  const { url, subdomain } = program.opts() as {
+    url?: string
+    subdomain?: string
+  }
+  const specifier = toHostSpecifier({ url, subdomain })
+  if (specifier === undefined) {
+    program.help({ error: true })
+  }
+  const client = new sandbar.Client(specifier)
+  main(client)
 }
