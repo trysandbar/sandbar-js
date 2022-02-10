@@ -6,11 +6,22 @@ export type EventResponse = {
   isSuccessful: boolean
   message: string
 } & (
-  | {
+  | ({
       responseType: "entity"
-      sourceEntityId: string
-      generatedId: string
-    }
+    } & (
+      | {
+          sourceEntityId: string
+          generatedId: string
+        }
+      | {
+          sourceEntityId?: string
+          generatedId: string
+        }
+      | {
+          sourceEntityId: string
+          generatedId?: string
+        }
+    ))
   | {
       responseType: "account"
       sourceAccountId: publicapi.AccountIdentifier

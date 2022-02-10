@@ -1,4 +1,3 @@
-import { assert } from "console"
 import fetchMock from "jest-fetch-mock"
 jest.setMock("cross-fetch", fetchMock)
 
@@ -10,7 +9,7 @@ beforeEach(() => {
 })
 
 test("well-formed submit request succeeds", async () => {
-  const api = new sandbar.Client("hello.dev")
+  const api = new sandbar.Client({ subdomain: "hello.dev" })
   fetchMock.mockIf(
     /https:\/\/hello\.dev\.sandbar\.ai\/v0\/submit_event\/?/,
     async (_req) => {
@@ -44,7 +43,7 @@ test("well-formed submit request succeeds", async () => {
 })
 
 test("id string with non-numeric fails", async () => {
-  const api = new sandbar.Client("hello.dev")
+  const api = new sandbar.Client({ subdomain: "hello.dev" })
   const alphaId = "abc"
   await expect(
     api.submitEvents([
@@ -119,7 +118,7 @@ test("creat new entities, accounts, links, and transaction", async () => {
       return JSON.stringify(resp)
     }
   )
-  const api = new sandbar.Client("hello.dev")
+  const api = new sandbar.Client({ subdomain: "hello.dev" })
   const result = await api.submitEvents([
     {
       type: sandbar.EventType.CREATE,

@@ -6,6 +6,8 @@ import {
   translateEventResponse,
 } from "./translators/translate-event-response"
 import {
+  CompleteEntity,
+  CompleteEntityCreate,
   Entity,
   translateEntityResponse,
 } from "./translators/translate-entity-response"
@@ -15,8 +17,31 @@ import { IMessageType } from "@protobuf-ts/runtime"
 import { translateInvestigation } from "./translators/translate-investigation"
 
 function base64encode(input: string) {
-  Buffer.from(input, "utf8").toString("base64")
+  return Buffer.from(input, "utf8").toString("base64")
 }
+
+type EventPayloadReplacingEntityType<TEntity extends publicapi.Entity> =
+  | Exclude<publicapi.Event["payload"], { oneofKind: "entity" }>
+  | { oneofKind: "entity"; entity: TEntity }
+
+type Event = Omit<publicapi.Event, "payload" | "incomplete" | "type"> &
+  (
+    | {
+        payload: EventPayloadReplacingEntityType<CompleteEntityCreate>
+        incomplete: false
+        type: publicapi.EventType.CREATE
+      }
+    | {
+        payload: EventPayloadReplacingEntityType<CompleteEntity>
+        incomplete: false
+        type: Exclude<publicapi.EventType, publicapi.EventType.CREATE>
+      }
+    | {
+        payload: EventPayloadReplacingEntityType<publicapi.Entity>
+        incomplete: true
+        type: publicapi.EventType
+      }
+  )
 
 interface SubmitEventsResponse {
   message: string
@@ -34,19 +59,40 @@ type Method<I extends object, O extends object> = {
   output: IMessageType<O>
 }
 
-class Client {
-  private base: string
-  constructor(
-    subdomain: string,
-    private auth?: {
-      username: string
-      password: string
+type HostSpecifier =
+  | {
+      subdomain: string
     }
+  | {
+      url: string
+    }
+
+type Auth = {
+  username: string
+  password: string
+}
+
+class Client {
+  private base: URL
+  private auth: Auth | undefined
+
+  constructor(
+    options: {
+      auth?: Auth
+    } & HostSpecifier
   ) {
-    this.base = `https://${subdomain}.sandbar.ai`
+    const { auth } = options
+    const base = new URL(
+      "subdomain" in options
+        ? `https://${options.subdomain}.sandbar.ai`
+        : options.url
+    )
+
+    this.base = base
+    this.auth = auth
   }
 
-  async submitEvents(events: publicapi.Event[]): Promise<SubmitEventsResponse> {
+  async submitEvents(events: Event[]): Promise<SubmitEventsResponse> {
     const { message, responses: grpcResponses } = await this.callMethod(
       methods.SubmitEvents,
       {
@@ -111,7 +157,7 @@ class Client {
   }
 
   async getAllInvestigations(
-    options: publicapi.GetAllInvestigationsRequest_Options
+    options?: publicapi.GetAllInvestigationsRequest_Options
   ): Promise<publicapi.GetAllInvestigationsResponse> {
     const { investigations: grpcInvestigations, message } =
       await this.callMethod(methods.GetAllInvestigations, { options })
@@ -143,8 +189,13 @@ class Client {
       },
       body,
     })
-
-    return response.text()
+    const text = await response.text()
+    if (!response.ok) {
+      throw new Error(
+        "Request failed with status " + response.status + ": " + text
+      )
+    }
+    return text
   }
 
   private getAuthHeaders(): { Authorization?: string } {
