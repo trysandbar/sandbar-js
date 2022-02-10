@@ -3,7 +3,6 @@
 import * as sandbar from "sandbar"
 import humanizeDuration from "humanize-duration"
 import { program } from "commander"
-import { toHostSpecifier } from "sandbar/src/client"
 
 const snooze = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -238,16 +237,49 @@ async function main() {
     "subdomain of the sandbar api endpoint; " +
       "only one of hostname or subdomain must be set"
   )
+  program.option(
+    "--username <username>",
+    "username for basic auth; if set, password must also be set"
+  )
+  program.option(
+    "--password <password>",
+    "password for basic auth; if set, username must also be set"
+  )
   program.parse(process.argv)
-  const { url, subdomain } = program.opts() as {
+  const { url, subdomain, username, password } = program.opts() as {
     url?: string
     subdomain?: string
+    username?: string
+    password?: string
   }
-  const specifier = toHostSpecifier({ url, subdomain })
-  if (specifier === undefined) {
+
+  // auth: if username is set, pw should be set, vice versa.
+  const auth =
+    username !== undefined && password !== undefined
+      ? { username, password }
+      : undefined
+  if (
+    auth === undefined &&
+    (username !== undefined || password !== undefined)
+  ) {
     program.help({ error: true })
   }
-  const client = new sandbar.Client(specifier)
+
+  // exactly one of url or subdomain should be set
+  const hostSpec =
+    url !== undefined
+      ? { url }
+      : subdomain !== undefined
+      ? { subdomain }
+      : undefined
+  if (
+    hostSpec === undefined ||
+    (url !== undefined && subdomain !== undefined)
+  ) {
+    program.help({ error: true })
+  }
+
+  const client = new sandbar.Client({ auth, ...hostSpec })
   const example = new Example(client)
   await example.main()
 }

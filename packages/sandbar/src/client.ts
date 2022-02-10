@@ -17,7 +17,7 @@ import { IMessageType } from "@protobuf-ts/runtime"
 import { translateInvestigation } from "./translators/translate-investigation"
 
 function base64encode(input: string) {
-  Buffer.from(input, "utf8").toString("base64")
+  return Buffer.from(input, "utf8").toString("base64")
 }
 
 type EventPayloadReplacingEntityType<TEntity extends publicapi.Entity> =
@@ -59,27 +59,13 @@ type Method<I extends object, O extends object> = {
   output: IMessageType<O>
 }
 
-export type HostSpecifier =
+type HostSpecifier =
   | {
       subdomain: string
     }
   | {
       url: string
     }
-
-export function toHostSpecifier({
-  subdomain,
-  url,
-}: {
-  subdomain?: string
-  url?: string
-}): HostSpecifier | undefined {
-  if (subdomain !== undefined && url === undefined) {
-    return { subdomain }
-  } else if (url !== undefined && subdomain === undefined) {
-    return { url }
-  }
-}
 
 type Auth = {
   username: string
@@ -203,8 +189,13 @@ class Client {
       },
       body,
     })
-
-    return response.text()
+    const text = await response.text()
+    if (!response.ok) {
+      throw new Error(
+        "Request failed with status " + response.status + ": " + text
+      )
+    }
+    return text
   }
 
   private getAuthHeaders(): { Authorization?: string } {
