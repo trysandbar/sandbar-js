@@ -4,13 +4,14 @@ import * as publicapi from "../generated/sandbar"
 type RequireKeys<T, TKeys extends keyof T> = Omit<T, TKeys> &
   Required<Pick<T, TKeys>>
 
-type CompleteEntity = RequireKeys<
+export type CompleteEntityCreate = RequireKeys<
   publicapi.Entity,
-  | "sandbarEntityId"
-  | "sourceEntityId"
-  | "relationshipBeginDate"
-  | "name"
-  | "birthIncorporationDate"
+  "sourceEntityId" | "name" | "birthIncorporationDate"
+>
+
+export type CompleteEntity = RequireKeys<
+  CompleteEntityCreate,
+  "sandbarEntityId"
 >
 
 export type Entity =
@@ -24,19 +25,18 @@ export function translateEntityResponse(entityGrpc: grpc.Entity): Entity {
     : { isGenerated, ...entityGrpc }
 }
 
-function isCompleteEntity(entity: grpc.Entity): entity is CompleteEntity {
-  const {
-    sandbarEntityId,
-    sourceEntityId,
-    relationshipBeginDate,
-    name,
-    birthIncorporationDate,
-  } = entity
+function isCompleteEntityCreate(
+  entity: grpc.Entity
+): entity is CompleteEntityCreate {
+  const { sourceEntityId, name, birthIncorporationDate } = entity
   return (
-    sandbarEntityId !== undefined &&
     sourceEntityId !== undefined &&
-    relationshipBeginDate !== undefined &&
     name !== undefined &&
     birthIncorporationDate != undefined
   )
+}
+
+function isCompleteEntity(entity: grpc.Entity): entity is CompleteEntity {
+  const { sandbarEntityId } = entity
+  return sandbarEntityId !== undefined && isCompleteEntityCreate(entity)
 }
