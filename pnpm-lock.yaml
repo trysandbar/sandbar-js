@@ -51,10 +51,14 @@ importers:
 
   packages/sandbar:
     specifiers:
+      '@protobuf-ts/runtime': ^2.2.2
+      '@protobuf-ts/runtime-rpc': ^2.2.2
       cross-fetch: ^3.1.5
       long: ^5.2.0
       node-fetch: ^3.2.0
     dependencies:
+      '@protobuf-ts/runtime': 2.2.2
+      '@protobuf-ts/runtime-rpc': 2.2.2
       cross-fetch: 3.1.5
       long: 5.2.0
       node-fetch: 3.2.0
@@ -1543,11 +1547,9 @@ packages:
     resolution: {integrity: sha512-Fbv4sCyrdl4z67uLdZD8nOE+T06N/rCYQDLroGRUJ/sYhTcua0H3ls2id+RkpYGh/P8rJH3ldHBptsRYShGAyQ==}
     dependencies:
       '@protobuf-ts/runtime': 2.2.2
-    dev: true
 
   /@protobuf-ts/runtime/2.2.2:
     resolution: {integrity: sha512-4tZToEhqCMwMb5PZ04xs7nRDmNGTy4ha8HNBdxmTnmVi4O0Ik/MlCTxX2v5P+OvqTN5CufXAaz7bmldf/fGLjg==}
-    dev: true
 
   /@sinonjs/commons/1.8.3:
     resolution: {integrity: sha512-xkNcLAn/wZaX14RPlwizcKicDk9G3F8m2nU3L7Ukm5zBgTwiT0wsoFAHx9Jq56fJA1z/7uKGtCRu16sOUCLIHQ==}
@@ -2630,6 +2632,7 @@ packages:
 
   /encoding/0.1.13:
     resolution: {integrity: sha512-ETBauow1T35Y/WZMkio9jiM0Z5xjHHmJ4XmjZOq1l/dXz3lr2sRn87nJy20RupqSh1F2m3HHPSp8ShIPQJrJ3A==}
+    requiresBuild: true
     dependencies:
       iconv-lite: 0.6.3
     dev: true
@@ -2924,6 +2927,7 @@ packages:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -6214,6 +6218,7 @@ packages:
     resolution: {integrity: sha512-FAGKF12fWdkpvNJZENacOH0e/83eG6JyVQyanIJaBXCN1J11TUQv1T1/z8S+Z0CG0ZPk1nPcreF/c7lrTd0TEQ==}
     engines: {node: '>=0.8.0'}
     hasBin: true
+    requiresBuild: true
     dev: true
     optional: true
 

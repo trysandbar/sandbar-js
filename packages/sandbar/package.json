@@ -40,6 +40,8 @@
   },
   "homepage": "https://github.com/trysandbar/sandbar-js#readme",
   "dependencies": {
+    "@protobuf-ts/runtime": "^2.2.2",
+    "@protobuf-ts/runtime-rpc": "^2.2.2",
     "cross-fetch": "^3.1.5",
     "long": "^5.2.0",
     "node-fetch": "^3.2.0"
