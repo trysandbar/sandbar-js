@@ -41,7 +41,7 @@ importers:
       '@types/humanize-duration': ^3.27.1
       commander: ^9.0.0
       humanize-duration: ^3.27.1
-      sandbar: ^0.1.0-alpha.5
+      sandbar: ^0.1.0-alpha.6
     dependencies:
       commander: 9.0.0
       humanize-duration: 3.27.1
