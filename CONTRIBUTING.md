@@ -13,8 +13,36 @@ pnpm build    # built to `./dist` dir
 
 ## Versioning & publishing the dist Bundle
 
+This section documents how to create a new version of the library and publish it
+to npm for use by consumers.
+
+### NPM permissions
+
 Ask someone to add your npm account to the list of "Collaborators" for the
 package [in npm](https://www.npmjs.com/package/sandbar/access).
+
+### Pre-requisites
+
+Install (`pre-commit`)[https://github.com/pre-commit/pre-commit]. You can do so
+by running one of the commands below.
+
+```sh
+# via hoembrew
+brew install pre-commit
+
+# or by pip if you prefer
+pip install pre-commit
+
+# if pip points to python2, you'll need to specify pip3
+pip3 install pre-commit
+```
+
+_Why do I need pre-commit to publish?_
+
+The publishing script autofixes formatting via . Without pre-commit, the version
+update script will fail, which in turn means the publish command will also fail.
+
+### Publish
 
 Running `lerna publish` or `lerna version` will:
 
