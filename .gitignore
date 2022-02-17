@@ -105,3 +105,6 @@ dist
 
 # protobuf/gRPC
 src/generated/
+
+# macOS
+.DS_Store
