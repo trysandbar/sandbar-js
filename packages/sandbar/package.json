@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "test": "jest",
@@ -16,7 +17,8 @@
     "transform-proto": "./src/scripts/transform-proto.ts",
     "gen-method-sigs": "./src/scripts/generate-method-signatures.ts",
     "codegen": "pnpm run gen-proto && pnpm run gen-method-sigs && pnpm run transform-proto",
-    "clean": "tsc --build tsconfig.build.json --clean && rm -rf src/generated"
+    "clean": "tsc --build tsconfig.build.json --clean && rm -rf src/generated && rm README.md",
+    "prepack": "./scripts/generate-readme.sh"
   },
   "repository": {
     "type": "git",
