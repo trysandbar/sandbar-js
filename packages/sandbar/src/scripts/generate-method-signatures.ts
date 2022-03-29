@@ -1,5 +1,5 @@
 #!/usr/bin/env ts-node-script
-import { SandbarDataService } from "../generated/private/sandbar"
+import { SandbarApiService } from "../generated/private/sandbar"
 import { HttpRule } from "../generated/private/google/api/http"
 import { IMessageType } from "@protobuf-ts/runtime"
 import { readMethodOption } from "@protobuf-ts/runtime-rpc"
@@ -17,7 +17,7 @@ type MethodSignature = {
 
 function getMethodSignatures(): { [key: string]: MethodSignature } {
   let result: { [key: string]: MethodSignature } = {}
-  for (const methodInfo of SandbarDataService.methods) {
+  for (const methodInfo of SandbarApiService.methods) {
     const { localName, name, I, O } = methodInfo
     const path = getHttpPathForMethod(localName)
     result[name] = { path, input: getTypeName(I), output: getTypeName(O) }
@@ -36,7 +36,7 @@ function getTypeName(messageType: IMessageType<object>) {
 
 function getHttpPathForMethod(method: string) {
   const rule = readMethodOption(
-    SandbarDataService,
+    SandbarApiService,
     method,
     "google.api.http",
     HttpRule
