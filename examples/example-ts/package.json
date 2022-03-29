@@ -1,7 +1,7 @@
 {
   "name": "example-ts",
   "private": true,
-  "version": "0.1.0-alpha.8",
+  "version": "0.1.0-alpha.9",
   "description": "example usage of the sandbar client library in typescript",
   "scripts": {
     "test": "jest --passWithNoTests",
@@ -34,7 +34,7 @@
   "dependencies": {
     "commander": "^9.0.0",
     "humanize-duration": "^3.27.1",
-    "sandbar": "^0.1.0-alpha.8"
+    "sandbar": "^0.1.0-alpha.9"
   },
   "devDependencies": {
     "@types/humanize-duration": "^3.27.1"
