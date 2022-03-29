@@ -42,38 +42,6 @@ test("well-formed submit request succeeds", async () => {
   ])
 })
 
-test("id string with non-numeric fails", async () => {
-  const api = new sandbar.Client({ subdomain: "hello.dev" })
-  const alphaId = "abc"
-  await expect(
-    api.submitEvents([
-      {
-        type: sandbar.EventType.CREATE,
-        incomplete: false,
-        payload: {
-          oneofKind: "accountEntityLink",
-          accountEntityLink: {
-            accountId: {
-              oneofKind: "sandbarAccountId",
-              sandbarAccountId: alphaId,
-            },
-            entityId: {
-              entityId: {
-                oneofKind: "sandbarEntityId",
-                sandbarEntityId: "123",
-              },
-            },
-            startDate: "lol",
-          },
-        },
-      },
-    ])
-  ).rejects.toThrowWithMessage(
-    SyntaxError,
-    `Cannot convert ${alphaId} to a BigInt`
-  )
-})
-
 test("creat new entities, accounts, links, and transaction", async () => {
   const resp: grpc.SubmitEventsResponse = {
     message: "success",
