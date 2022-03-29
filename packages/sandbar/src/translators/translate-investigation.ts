@@ -2,7 +2,7 @@ import * as publicapi from "../generated/sandbar"
 import * as grpc from "../generated/private/sandbar"
 
 function translateTarget(
-  grpcTarget: grpc.InvestigationTarget | undefined
+  grpcTarget?: grpc.InvestigationTarget
 ): publicapi.InvestigationTarget {
   if (grpcTarget === undefined) {
     throw new Error(
@@ -10,15 +10,15 @@ function translateTarget(
     )
   }
 
-  const { target } = grpcTarget
-  if (target.oneofKind === undefined) {
+  const { sandbarTargetId } = grpcTarget
+  if (sandbarTargetId.trim().length === 0) {
     throw new Error(
-      "Server returned a response without an investigation target type, that is illegal"
+      "Server responded with an empty sandbar ID string, that is illegal"
     )
   }
 
   return {
-    target,
+    sandbarTargetId,
   }
 }
 
