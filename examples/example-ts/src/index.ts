@@ -11,29 +11,11 @@ class Example {
     private client = new sandbar.Client({ url: "http://localhost:10000" })
   ) {}
 
-  async getEntity(sandbarId: string): Promise<void> {
-    const result = await this.client.getEntities([
-      { oneofKind: "sandbarEntityId", sandbarEntityId: sandbarId },
-    ])
-    console.log(`get entity response: ${JSON.stringify(result, undefined, 2)}`)
-  }
-
-  async getAllInvestigations(waitMs?: number): Promise<void> {
-    if (waitMs !== undefined) {
-      console.log(`waiting ${humanizeDuration(waitMs)} for rule calc to finish`)
-      await snooze(waitMs)
-    }
-    const investigations = await this.client.getAllInvestigations()
-    console.log(
-      `investigations: ${JSON.stringify(investigations, undefined, 2)}`
-    )
-  }
-
   async main(): Promise<void> {
     console.log("creating entity")
 
     // Send data to sandbar
-    const sendEntityRes = await this.client.submitEvents([
+    const submitEventsRes = await this.client.submitEvents([
       {
         type: sandbar.EventType.CREATE,
         payload: {
@@ -56,15 +38,6 @@ class Example {
         },
         incomplete: false,
       },
-    ])
-
-    console.log(
-      `submit entity response: ${JSON.stringify(sendEntityRes, undefined, 2)}`
-    )
-
-    await this.getEntity("1")
-
-    const sendAcctRes = await this.client.submitEvents([
       {
         type: sandbar.EventType.CREATE,
         payload: {
@@ -79,13 +52,6 @@ class Example {
         },
         incomplete: false,
       },
-    ])
-
-    console.log(
-      `submit account response: ${JSON.stringify(sendAcctRes, undefined, 2)}`
-    )
-
-    const sendLinkRes = await this.client.submitEvents([
       {
         type: sandbar.EventType.CREATE,
         payload: {
@@ -109,14 +75,7 @@ class Example {
         },
         incomplete: false,
       },
-    ])
-
-    console.log(
-      `submit link response: ${JSON.stringify(sendLinkRes, undefined, 2)}`
-    )
-
-    const sendTxnsRes = await this.client.submitEvents(
-      [
+      ...[
         {
           sourceTransactionId: "321654",
           transactionAmount: 1607.48,
@@ -168,7 +127,7 @@ class Example {
       ].map((rest) => ({
         type: sandbar.EventType.CREATE,
         payload: {
-          oneofKind: "transaction",
+          oneofKind: "transaction" as const,
           transaction: {
             transactionType: sandbar.TransactionType.DEPOSIT,
             transactionSourceEntityId: "HelloJerry",
@@ -182,46 +141,40 @@ class Example {
           },
         },
         incomplete: false,
-      }))
-    )
-
-    console.log(
-      `send txns response: ${JSON.stringify(sendTxnsRes, undefined, 2)}`
-    )
-
-    await this.getAllInvestigations(3000)
-
-    const sendLastTxnRes = await this.client.submitEvents([
-      {
-        type: sandbar.EventType.CREATE,
-        payload: {
-          oneofKind: "transaction",
-          transaction: {
-            transactionType: sandbar.TransactionType.DEPOSIT,
-            transactionSourceEntityId: "HelloJerry",
-            transactionCurrency: "USD",
-            accountIdentifier: {
-              bankName: "Chemical Bank",
-              accountNumber: "123456789",
-            },
-            transactionSourceRoutingNumber: 1111,
-            sourceTransactionId: "109876",
-            isCredit: true,
-            transactionAmount: 15000,
-            productType: sandbar.ProductType.US_CURRENCY,
-            description: "Deposit from selling sitcom <Jerry> to NBC.",
-            executeTransactionDateTime: "2021-12-10T00:00:00.001Z",
-          },
-        },
-        incomplete: false,
-      },
+      })),
     ])
 
     console.log(
-      `send last txn response: ${JSON.stringify(sendLastTxnRes, undefined, 2)}`
+      `submit events response: ${JSON.stringify(submitEventsRes, undefined, 2)}`
     )
 
-    await this.getAllInvestigations(3000)
+    const sendSyncRes = await this.client.submitEventSync({
+      type: sandbar.EventType.CREATE,
+      payload: {
+        oneofKind: "transaction",
+        transaction: {
+          transactionType: sandbar.TransactionType.DEPOSIT,
+          transactionSourceEntityId: "HelloJerry",
+          transactionCurrency: "USD",
+          accountIdentifier: {
+            bankName: "Chemical Bank",
+            accountNumber: "123456789",
+          },
+          transactionSourceRoutingNumber: 1111,
+          sourceTransactionId: "109876",
+          isCredit: true,
+          transactionAmount: 15000,
+          productType: sandbar.ProductType.US_CURRENCY,
+          description: "Deposit from selling sitcom <Jerry> to NBC.",
+          executeTransactionDateTime: "2021-12-10T00:00:00.001Z",
+        },
+      },
+      incomplete: false,
+    })
+
+    console.log(
+      `send sync response: ${JSON.stringify(sendSyncRes, undefined, 2)}`
+    )
   }
 }
 

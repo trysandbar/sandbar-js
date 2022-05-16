@@ -1,13 +1,13 @@
 import * as publicapi from "../generated/sandbar"
 import * as grpc from "../generated/private/sandbar"
+import { Status } from "../generated/private/google/rpc/status"
 
 /**
  * Response for the event submitted to the sandbar API
  */
 export type EventResponse = {
   sandbarId: string
-  isSuccessful: boolean
-  message: string
+  status?: Status
 } & (
   | ({
       responseType: "entity"
@@ -41,23 +41,16 @@ export type EventResponse = {
 export function translateEventResponse(
   response: grpc.EventResponse
 ): EventResponse {
-  const {
-    sourceId,
-    isSuccessful,
-    sandbarId,
-    message,
-    generatedId,
-    eventResponseType,
-  } = response
+  const { sourceId, sandbarId, generatedId, eventResponseType, status } =
+    response
   switch (eventResponseType) {
     case publicapi.EventResponseType.ENTITY:
       return {
         responseType: "entity",
         sourceEntityId: sourceId,
-        isSuccessful,
         sandbarId,
-        message,
         generatedId,
+        status,
       }
     case publicapi.EventResponseType.ACCOUNT: {
       const [bankName, accountNumber] = sourceId.split("|", 2)
@@ -67,25 +60,22 @@ export function translateEventResponse(
           bankName,
           accountNumber,
         },
-        isSuccessful,
         sandbarId,
-        message,
+        status,
       }
     }
     case publicapi.EventResponseType.ACCOUNT_ENTITY_LINK:
       return {
         responseType: "accountEntityLink",
-        isSuccessful,
         sandbarId,
-        message,
+        status,
       }
     case publicapi.EventResponseType.TRANSACTION:
       return {
         responseType: "transaction",
         sourceTransactionId: sourceId,
-        isSuccessful,
         sandbarId,
-        message,
+        status,
       }
     case publicapi.EventResponseType.UNSPECIFIED:
       throw new TypeError(
