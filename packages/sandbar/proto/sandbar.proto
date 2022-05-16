@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/api/annotations.proto";
+import "google/rpc/status.proto";
 
 option java_multiple_files = true;
 option java_package = "io.grpc.sandbar";
@@ -184,14 +185,14 @@ service SandbarApiService {
 
   // Updates the analysis associated with an object (must be an investigation)
   rpc UpdateAnalysis(UpdateAnalysisRequest) returns (UpdateAnalysisResponse) {
-    option(google.api.http) = {
+    option (google.api.http) = {
       post: "/v0/update_analysis"
-      };
+    };
   }
 
   // Gets the analyses associated with the specified objects
   rpc GetAnalysesForObjects(GetAnalysesForObjectsRequest) returns (GetAnalysesForObjectsResponse) {
-    option(google.api.http) = {
+    option (google.api.http) = {
       post: "/v0/get_analysis_for_objects"
     };
   }
@@ -199,14 +200,14 @@ service SandbarApiService {
   // Creates a link between a file and an investigation or an alert in our system.
   // This method returns an upload link to submit the file's contents.
   rpc AddAttachment(AddAttachmentRequest) returns (AddAttachmentResponse) {
-    option(google.api.http) = {
+    option (google.api.http) = {
       post: "/v0/add_attachment"
     };
   }
 
   // Gets URLs at which the contents of previously uploaded attachments can be found
   rpc GetAttachmentDownloadUrls(GetAttachmentDownloadUrlsRequest) returns (GetAttachmentDownloadUrlsResponse) {
-    option(google.api.http) = {
+    option (google.api.http) = {
       post: "/v0/get_attachment_download_urls"
     };
   }
@@ -271,6 +272,12 @@ service SandbarApiService {
   }
 }
 
+// Message containing a detailed error response
+message ErrorDetails {
+  // The details of the error
+  string details = 1;
+}
+
 /* @exclude EVENT SECTION */
 
 // Set of events to be processed and ingested by sandbar.
@@ -310,41 +317,46 @@ message Event {
   bool incomplete = 7;
 }
 
-//
+// Information about an event that was processed
 message EventResponse {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
   // The sandbar ID of the item created/changed/deleted by the event.
-  string sandbar_id = 1;
+  string sandbar_id = 2;
   // The source ID of the item created/changed/deleted by the event that the time the event was sent.
-  string source_id = 2;
-  // Indicator of whether or not a call is successfully processed.
-  bool is_successful = 3;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 4;
-  // In the event that there is an incomplete item, this is the sandbar-generated ID for the object.
-  string generated_id = 5;
+  string source_id = 3;
+ // In the event that there is an incomplete item, this is the sandbar-generated ID for the object.
+  string generated_id = 4;
   // Specifies the type of payload that this message is in response to
-  EventResponseType event_response_type = 6;
+  EventResponseType event_response_type = 5;
+  // The event as submitted
+  Event request = 6;
 }
 
 // Response from a call to submit events endpoint.
 message SubmitEventsResponse {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
   // List of responses. Not guaranteed to be in the same order as the requests.
-  repeated EventResponse responses = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
+  repeated EventResponse responses = 2;
 }
 
 // Response from a call to submit events and get rule outputs endpoint.
 message SubmitEventAndGetRuleOutputsResponse {
-  // Event response
-  EventResponse response = 1;
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
+  // The sandbar ID of the item created/changed/deleted by the event.
+  string sandbar_id = 2;
+  // The source ID of the item created/changed/deleted by the event that the time the event was sent.
+  string source_id = 3;
+  // In the event that there is an incomplete item, this is the sandbar-generated ID for the object.
+  string generated_id = 4;
+  // Specifies the type of payload that this message is in response to
+  EventResponseType event_response_type = 5;
+  // The event as submitted
+  Event request = 6;
   // List of all rule outputs triggered by the event submission.
-  repeated RuleOutput rule_outputs = 2;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 3;
+  repeated RuleOutput rule_outputs = 7;
 }
 
 
@@ -1152,13 +1164,12 @@ message AddAttachmentRequest {
 // A response containing information about the added attachment,
 // including a URL to upload the contents of the file to.
 message AddAttachmentResponse {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
   // The sandbar-generated unique ID for the attachment
-  string attachment_sandbar_id = 1;
+  string attachment_sandbar_id = 2;
   // A URL to upload the contents of the attachment file
-  string url = 2;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states.
-  string message = 3;
+  string url = 3;
 }
 
 // A request for a link that can be used to download previously uploaded attachments
@@ -1169,20 +1180,18 @@ message GetAttachmentDownloadUrlsRequest {
 
 // A response containing URLs for retrieving the contents of previously uploaded attachments.
 message GetAttachmentDownloadUrlsResponse {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
   // A mapping between attachment's sandbar-generated unique IDs and URLs at which their contents can be found
-  map<string, AttachmentDownloadLink> urls_by_attachment_sandbar_id = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states.
-  string message = 2;
+  map<string, AttachmentDownloadLink> urls_by_attachment_sandbar_id = 2;
 }
 
 // A response containing a URL to download the contents of an attachment from.
 message AttachmentDownloadLink {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
   // The URL at which the attachment can be downloaded.
-  string url = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states.
-  string message = 2;
+  string url = 2;
 }
 
 // A request to associate an attachment with an object (must be an alert or an investigation)
@@ -1195,11 +1204,10 @@ message AddAttachmentToObjectRequest {
 
 // A response containing information about the attachment associated with an object
 message AddAttachmentToObjectResponse {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
   // The sandbar-generated unique ID for the attachment-object link
-  string attachment_object_link_sandbar_id = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
+  string attachment_object_link_sandbar_id = 2;
 }
 
 // A request to remove an association between a attachment and an object
@@ -1212,9 +1220,8 @@ message RemoveAttachmentFromObjectRequest {
 
 // A response confirming a attachment is no longer associated with an object
 message RemoveAttachmentFromObjectResponse {
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 1;
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
 }
 
 // A request for all attachments associated with the specified objects
@@ -1226,11 +1233,10 @@ message GetAttachmentsForObjectsRequest {
 // A response containing all attachments for objects, indexed by the sandbar-generated
 // unique ID for each object
 message GetAttachmentsForObjectsResponse {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
   // A mapping between objects' unique sandbar-generated IDs and a list of attachments associated with them
-  map<string, AttachmentObjectLinkList> attachments_by_subject_sandbar_id = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
+  map<string, AttachmentObjectLinkList> attachments_by_subject_sandbar_id = 2;
 }
 
 // Information about an attachment uploaded to Sandbar
@@ -1255,8 +1261,10 @@ message AttachmentObjectLink {
 
 // A list of attachment-object links
 message AttachmentObjectLinkList {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
   // The attachment object links
-  repeated AttachmentObjectLink attachment_object_links = 1;
+  repeated AttachmentObjectLink attachment_object_links = 2;
 }
 
 // A request to add a report based on manual risk analysis
