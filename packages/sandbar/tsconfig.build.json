@@ -6,10 +6,5 @@
     "tsBuildInfoFile": "../../.build-cache/sandbar.tsbuildinfo"
   },
   "include": ["./src/**/*.ts"],
-  "exclude": [
-    "./src/tests/**/*",
-    "./src/**/*.test.ts",
-    "./src/scripts/**/*",
-    "./src/generated/private/google/**/*"
-  ]
+  "exclude": ["./src/tests/**/*", "./src/**/*.test.ts", "./src/scripts/**/*"]
 }
