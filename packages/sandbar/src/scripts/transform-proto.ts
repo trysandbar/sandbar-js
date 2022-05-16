@@ -35,6 +35,8 @@ const transformConfig: { [key: string]: string[] } = {
   Transaction: ["accountIdentifier"],
 }
 
+const importPassthru = ["./google/rpc/status"]
+
 function isNamePresentInConfig(interfaceName: string, propertyName: string) {
   if (!Object.keys(transformConfig).includes(interfaceName)) {
     return false
@@ -277,6 +279,33 @@ function getTransformerFactory(
             importForEnum(node, factory, importPath),
             exportForEum(node, factory),
           ]
+        }
+
+        if (ts.isImportDeclaration(node)) {
+          const { moduleSpecifier, importClause } = node
+          if (!ts.isStringLiteral(moduleSpecifier)) {
+            return
+          }
+
+          // e.g. given the import:
+          //
+          //   import { Status } from "./google/rpc/status";
+          //
+          // `importString` is "./google/rpc/status" (without the quotes)
+          const importString = moduleSpecifier.text
+
+          if (!importPassthru.includes(importString)) {
+            return
+          }
+
+          return factory.createImportDeclaration(
+            undefined,
+            undefined,
+            importClause,
+            factory.createStringLiteral(
+              "./" + path.join("./private", importString)
+            )
+          )
         }
 
         // remove all remaining top-level nodes except interface declarations

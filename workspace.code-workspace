@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"name": "✨ root",
+			"path": "."
+		},
+		{
+			"name": "example-ts",
+			"path": "examples/example-ts"
+		},
+		{
+			"name": "📦 sandbar",
+			"path": "packages/sandbar"
+		}
+	],
+	"settings": {
+		"typescript.tsdk": "✨ root/node_modules/typescript/lib"
+	}
+}

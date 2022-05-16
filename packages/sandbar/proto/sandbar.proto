@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/api/annotations.proto";
+import "google/rpc/status.proto";
 
 option java_multiple_files = true;
 option java_package = "io.grpc.sandbar";
@@ -25,131 +26,6 @@ service SandbarApiService {
       body: "*"
     };
   }
-
-  // This simple endpoint just takes in and returns an entity.
-  rpc GetEntity(GetEntityRequest) returns (GetEntityResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_entity"
-      body: "*"
-    };
-  }
-
-  // This end point is used to get information about a given account.
-  rpc GetAccount(GetAccountRequest) returns (GetAccountResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_account"
-      body: "*"
-    };
-  }
-
-  // This is to retrieve the set of latest rule outputs for a given entity for all rules.
-  rpc GetRuleOutputForEntities(GetRuleOutputForEntitiesRequest) returns (GetRuleOutputForEntitiesResponse) {
-    option (google.api.http) = {
-      post: "/v0/results_for_entities"
-      body: "*"
-    };
-  }
-
-  // This endpoint retrieves all the accounts that are associated with a given entity.
-  rpc GetAccountsForEntity(GetAccountsForEntityRequest) returns (GetAccountsForEntityResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_accounts_for_entity"
-      body: "*"
-    };
-  }
-
-  // This endpoint will return all the transactions for a given entity.
-  rpc GetTransactionsForEntity(GetTransactionsForEntityRequest) returns (GetTransactionsForEntityResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_transactions_for_entity"
-      body: "*"
-    };
-  }
-
-  // This query will return a set of specified alerts.
-  rpc GetAlerts(GetAlertsRequest) returns (GetAlertsResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_alerts"
-      body: "*"
-    };
-  }
-
-  // This query will return a set of specified investigations.
-  rpc GetInvestigations(GetInvestigationsRequest) returns (GetInvestigationsResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_investigations"
-      body: "*"
-    };
-  }
-
-  // This query will return all investigations for an entity.
-  rpc GetAllInvestigations(GetAllInvestigationsRequest) returns (GetAllInvestigationsResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_all_investigations"
-      body: "*"
-    };
-  }
-
-  // This allows a user to manually close a given alert. If this closes the last open alert in
-  // an investigation, this call will close the enclolsed investigation as well.
-  rpc CloseAlert(CloseAlertRequest) returns (CloseAlertResponse) {
-    option (google.api.http) = {
-      post: "/v0/close_alert"
-      body: "*"
-    };
-  }
-
-  // This allows a user to manually close a given investigation. This will close all enclosed
-  // alerts that remain open.
-  rpc CloseInvestigation(CloseInvestigationRequest) returns (CloseInvestigationResponse) {
-    option (google.api.http) = {
-      post: "/v0/close_investigation"
-      body: "*"
-    };
-  }
-
-  // This is to retrieve the history of rule output for a given entity for all rules.
-  // Entity search arg because we are essentially looking up the entity where we
-  // then have to
-  rpc GetRuleOutputHistoryForEntity(GetRuleOutputHistoryForEntityRequest) returns (GetRuleOutputHistoryForEntityResponse) {
-    option (google.api.http) = {
-      post: "/v0/results_history_for_entity"
-      body: "*"
-    };
-  }
-
-  // Create a comment for a specified object
-  rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {
-    option (google.api.http) = {
-      post: "/v0/create_comment"
-      body: "*"
-    };
-  }
-
-  // Update the contents of an existing comment
-  rpc UpdateComment(UpdateCommentRequest) returns (UpdateCommentResponse) {
-    option (google.api.http) = {
-      post: "/v0/update_comment"
-      body: "*"
-    };
-  }
-
-  // Retrieves all comments for the specified investigation
-  rpc GetCommentsForInvestigation(GetCommentsForInvestigationRequest) returns (GetCommentsForInvestigationResponse) {
-    option (google.api.http) = {
-      post: "/v0/comments_for_investigation"
-      body: "*"
-    };
-  }
-
-  // Retrieves all comments for the specified alert
-  rpc GetCommentsForAlert(GetCommentsForAlertRequest) returns (GetCommentsForAlertResponse) {
-    option (google.api.http) = {
-      post: "/v0/comments_for_alert"
-      body: "*"
-    };
-  }
-
 }
 
 /* @exclude EVENT SECTION */
@@ -191,41 +67,46 @@ message Event {
   bool incomplete = 7;
 }
 
-//
+// Information about an event that was processed
 message EventResponse {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
   // The sandbar ID of the item created/changed/deleted by the event.
-  string sandbar_id = 1;
+  string sandbar_id = 2;
   // The source ID of the item created/changed/deleted by the event that the time the event was sent.
-  string source_id = 2;
-  // Indicator of whether or not a call is successfully processed.
-  bool is_successful = 3;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 4;
-  // In the event that there is an incomplete item, this is the sandbar-generated ID for the object.
-  string generated_id = 5;
+  string source_id = 3;
+ // In the event that there is an incomplete item, this is the sandbar-generated ID for the object.
+  string generated_id = 4;
   // Specifies the type of payload that this message is in response to
-  EventResponseType event_response_type = 6;
+  EventResponseType event_response_type = 5;
+  // The event as submitted
+  Event request = 6;
 }
 
 // Response from a call to submit events endpoint.
 message SubmitEventsResponse {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
   // List of responses. Not guaranteed to be in the same order as the requests.
-  repeated EventResponse responses = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
+  repeated EventResponse responses = 2;
 }
 
 // Response from a call to submit events and get rule outputs endpoint.
 message SubmitEventAndGetRuleOutputsResponse {
-  // Event response
-  EventResponse response = 1;
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
+  // The sandbar ID of the item created/changed/deleted by the event.
+  string sandbar_id = 2;
+  // The source ID of the item created/changed/deleted by the event that the time the event was sent.
+  string source_id = 3;
+  // In the event that there is an incomplete item, this is the sandbar-generated ID for the object.
+  string generated_id = 4;
+  // Specifies the type of payload that this message is in response to
+  EventResponseType event_response_type = 5;
+  // The event as submitted
+  Event request = 6;
   // List of all rule outputs triggered by the event submission.
-  repeated RuleOutput rule_outputs = 2;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 3;
+  repeated RuleOutput rule_outputs = 7;
 }
 
 
@@ -277,35 +158,6 @@ message Entity {
   optional string phone_number = 13;
 }
 
-// Query containing entity information.
-message EntityQuery {
-  // A parameter containing information needed to identify an entity.
-  repeated EntityQueryIdParam ids = 1;
-  reserved 2, 3;
-  reserved "knowledge_date", "effective_date";
-}
-
-// A request containing information necessary to get rule outputs for a given entity.
-message GetRuleOutputForEntitiesRequest {
-  // Specifies which entities to request for rule outputs for.
-  EntityQuery request = 1;
-}
-
-// A request containing information necessary to get a given entity.
-message GetEntityRequest {
-  // Specifies entities to request detailed information on.
-  EntityQuery request = 1;
-}
-
-// A response containing requested entity information.
-message GetEntityResponse {
-  // Contents the entities requested.
-  repeated Entity entity = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
 /* @exclude ACCOUNT SECTION */
 
 // Information sufficient to identify a given account.
@@ -324,7 +176,7 @@ message Account {
   AccountIdentifier account_identifier = 2;
   // The type of account.
   AccountType account_type = 3;
-  // If an account contains crypto-currency, this is the type of currency in the account.
+  // If an account contains crypto-currency, this is the wallet's unique identifier
   optional string crypto_wallet_address = 4;
   // The type of crypto held in this wallet.
   optional string crypto_currency = 5;
@@ -332,31 +184,6 @@ message Account {
   optional string account_open_date = 6;
   // The date a given account was closed.
   optional string account_close_date = 7;
-}
-
-message AccountQueryIdParam {
-  oneof id {
-    // A sandbar ID for a given account.
-    string sandbar_account_id = 1;
-    // The information used to uniquely identify an account at a given point in time.
-    AccountIdentifier account_identifier = 2;
-  }
-}
-
-// The request sent when trying to get a specific account from sandbar.
-message GetAccountRequest {
-  repeated AccountQueryIdParam id = 1;
-  reserved 3, 4;
-  reserved "knowledge_date", "effective_date";
-}
-
-// Response containing requested account related information and a message.
-message GetAccountResponse {
-  // Set of accounts
-  repeated Account accounts = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
 }
 
 // A transaction may go through many different states in its lifetime. This represents the different
@@ -392,21 +219,6 @@ enum AccountType {
   ACCOUNT_TYPE_BROKERAGE = 4;
   // Another account type not specified here.
   ACCOUNT_TYPE_OTHER = 100;
-}
-
-// A request payload that allows a user to get a set of accounts for a given entity.
-message GetAccountsForEntityRequest {
-  // Information about the entity qe are trying to get accounts for.
-  EntityQueryIdParam id = 1;
-}
-
-// A response payload that contains information about a set of accounts owned by a single entity.
-message GetAccountsForEntityResponse {
-  // Set of accounts
-  repeated Account accounts = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
 }
 
 /* TRANSACTION */
@@ -485,21 +297,6 @@ message Transaction {
   optional int32 counterparty_routing_number = 35;
 }
 
-// A set of transactions associated with a requested entity.
-message GetTransactionsForEntityResponse {
-  // Set of requested transactions.
-  repeated Transaction transactions = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request that allows a user to get all the transactions associated with a given entity.
-message GetTransactionsForEntityRequest {
-  // Specifies the entity to request information on.
-  EntityQueryIdParam id = 1;
-}
-
 /* RULE OUTPUT */
 // Certain actions prompt sandbar to run our suite of rules against an investigation target.
 // Each time this happens, a rule output is generated with information about the risk assessed
@@ -519,38 +316,6 @@ message RuleOutput {
   InvestigationTarget investigation_target = 6;
   reserved 7, 8;
   reserved "knowledge_date", "effective_date";
-}
-
-// A response containing rule outputs for a given investigation target.
-message RuleOutputResponse {
-  // Identifies the investigation target the rule ran against.
-  InvestigationTarget investigation_target = 1;
-  // Rule outputs associated with the given investigation target.
-  repeated RuleOutput output = 2;
-}
-
-//
-message GetRuleOutputForEntitiesResponse {
-  // Requested rule outputs.
-  repeated RuleOutputResponse responses = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request payload that contains entity information used to get rule output history for that entity.
-message GetRuleOutputHistoryForEntityRequest {
-  // Specifies the entity to request information on.
-  EntityQueryIdParam id = 1;
-}
-
-// A message containing a history of rule outputs for a given entity.
-message GetRuleOutputHistoryForEntityResponse {
-  // All rule outputs generated throughout history for a given entity.
-  RuleOutputResponse response = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
 }
 
 /* Account-Entity Links */
@@ -610,105 +375,6 @@ enum EventType {
   EVENT_TYPE_DELETE = 3;
 }
 
-// In an Alert, a Next Step is a suggested course of action that an analyst may take to
-// either confirm or alleviate the given described risk.
-message NextStep {
-  // A description of the action to be taken.
-  string description = 1;
-}
-
-// When a rule creates an output that is deemed sufficiently risky, we are able to create an alert.
-// An alert groups all relevant information after the initial trigger into one place.
-message Alert {
-  // Sandbar identifier for a given alert.
-  string sandbar_alert_id = 1;
-  // Set of rule outputs associated with a given Alert.
-  repeated RuleOutput outputs = 2;
-  // The investigation target associated with this alert.
-  InvestigationTarget investigation_target = 3;
-  // Set of next steps a user may be able to take to help assess the risk associated with a given alert and help an analyst decide whether or not to file a SAR.
-  repeated NextStep next_steps = 4;
-  // A human readable name of the rule associated with the Alert.
-  string rule = 5;
-  // This indicates a version of a given rule that is being run.
-  int64 rule_version = 6;
-  // High water mark within look-back window
-  double high_water_mark_risk_score = 7;
-  // The status of the investigation into the alert.
-  InvestigationStatus status = 8;
-}
-
-// An investigation is a unit of work comprised of one or more alerts. This is the thing that an analyst or a group
-// of analysts should be working on. There may be one or more targets, and one or more types of risk topographies.
-// By default an investigation groups alerts on a given investigation unit.
-message Investigation {
-  // Sandbar ID of the given investigation.
-  string sandbar_investigation_id = 1;
-  // Set of alerts associated with the investigation.
-  repeated Alert alerts = 2;
-  // The targets of a given investigation.
-  repeated InvestigationTarget target = 3;
-  // The status of the investigation.
-  InvestigationStatus status = 4;
-}
-
-// The status of a given investigation.
-enum InvestigationStatus {
-  INVESTIGATION_STATUS_UNSPECIFIED = 0;
-  // An open investigation that requires attention.
-  INVESTIGATION_STATUS_OPEN = 1;
-  // An investigation that has been automatically closed by Sandbar due to its age.
-  INVESTIGATION_STATUS_AUTO_CLOSED = 2;
-  // An investigation that has been manually closed by a user upon assessment that the activity
-  // does not warrant a SAR filing.
-  INVESTIGATION_STATUS_MANUALLY_CLOSED_CLEARED = 3;
-  // An investigation that has been manually closed by a user upon assessment that the activity
-  // is suspicious and requires a SAR filing.
-  INVESTIGATION_STATUS_MANUALLY_CLOSED_SUSPICIOUS = 4;
-  // An investigation that is oh hold pending some internal or external action necessary
-  // to continue the assessment.
-  INVESTIGATION_STATUS_ON_HOLD = 5;
-  // An investigation that is in the process of being worked on by an investigator.
-  INVESTIGATION_STATUS_IN_PROGRESS = 6;
-  // Another investigation status that is not specified here.
-  INVESTIGATION_STATUS_OTHER = 100;
-}
-
-// Request for one or more alerts.
-message GetAlertsRequest {
-  // Sandbar IDs for requested alerts.
-  repeated string sandbar_alert_id = 1;
-}
-
-// Response containing requested alerts.
-message GetAlertsResponse {
-  // Requested alerts.
-  repeated Alert alerts = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// An unfiltered request for investigations.
-message GetAllInvestigationsRequest {
-  // Options for the investigation request.
-  message Options {
-    // If set to `true`, the response will include closed investigations.
-    bool include_closed = 1;
-  }
-  // Options for a given investigation request.
-  optional Options options = 1;
-}
-
-// A response sent in response to a request for all investigations.
-message GetAllInvestigationsResponse {
-  // The set of requested investigations.
-  repeated Investigation investigations = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
 // Identifying information about a given entity.
 message EntityQueryIdParam {
   oneof entity_id {
@@ -721,160 +387,9 @@ message EntityQueryIdParam {
   }
 }
 
-// Identifying information about an entity as an Investigation Target
-message TargetEntityId {
-  // Sandbar entity ID for the given investigation target.
-  string sandbar_entity_id = 1;
-  // Entity ID in the source system for the given investigation target.
-  optional string source_entity_id = 2;
-  // Sandbar generated ID for incomplete entities for the given investigation target.
-  optional string generated_entity_id = 3;
-}
-
 // Information about a target of an investigation.
 message InvestigationTarget {
   string sandbar_target_id = 1;
-}
-
-// A request for a set of investigations
-message GetInvestigationsRequest {
-  // Sandbar IDs of investigations to request detailed information on.
-  repeated string sandbar_investigation_id = 1;
-}
-
-// A response containing the requested set of investigations.
-message GetInvestigationsResponse {
-  // Set of requested investigations.
-  repeated Investigation investigation = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request to close an alert.
-message CloseAlertRequest {
-  // Sandbar identifier of alert to be closed.
-  string sandbar_alert_id = 1;
-}
-
-// A response carrying information about the result of a request to close an alert.
-message CloseAlertResponse {
-  // Information about the disposition of the closed alert.
-  CloseResult result = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request to close an investigation.
-message CloseInvestigationRequest {
-  // Sandbar identifier of investigation to be closed.
-  string sandbar_investigation_id = 1;
-}
-
-// A response carrying information about the result of a request to close an investigation.
-message CloseInvestigationResponse {
-  // Information about the disposition of the closed investigation.
-  CloseResult result = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request containing the contents of a comment
-// and the sandbar ID and type of the object
-// the comment is for
-// (must be an alert or investigation)
-message CreateCommentRequest {
-  // The sandbar ID of the subject
-  string subject_sandbar_id = 1;
-  // The contents of the comment
-  string contents = 2;
-}
-
-// A response containing information about a newly created comment
-message CreateCommentResponse {
-  // The sandbar ID of the created comment
-  string sandbar_comment_id = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request containing the updated contents
-// of an existing comment
-message UpdateCommentRequest {
-  // The sandbar ID of the comment to update
-  string sandbar_comment_id = 1;
-  // The new contents of the comment
-  string contents = 3;
-}
-
-// A response carrying information about the result of a request to update a comment.
-message UpdateCommentResponse {
-  // The sandbar ID of the updated comment
-  string sandbar_comment_id = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request for all comments associated with an investigation
-message GetCommentsForInvestigationRequest {
-  // The sandbar ID of the investigation to fetch comments for
- string sandbar_investigation_id = 1;
-}
-
-// A response containing all comments for the requested investigation
-message GetCommentsForInvestigationResponse {
-  // All comments on the investigation
-  repeated Comment comments = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request for all comments associated with an alert
-message GetCommentsForAlertRequest {
-  // The sandbar ID of the alert to fetch comments for
-  string sandbar_alert_id = 1;
-}
-
-// A response containing all comments for the requested alert
-message GetCommentsForAlertResponse {
-  // All comments on the alert
-  repeated Comment comments = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A user-generated comment on an object in our system
-message Comment {
-  // The sandbar-generated unique id for the comment
-  string sandbar_comment_id = 1;
-  // The text of the comment
-  string contents = 2;
-  // The sandbar-generated unique ID for the object the comment references
-  string subject_sandbar_id = 3;
-  // The time the comment was first created
-  string created_time = 4;
-  // The time the comment was most recently updated
-  string updated_time = 5;
-}
-
-// The various possible results of a request to close an alert or investigation.
-enum CloseResult {
-  CLOSE_RESULT_UNSPECIFIED = 0;
-  // The item was successfully closed.
-  CLOSE_RESULT_SUCCESSFUL = 1;
-  // The object was not found.
-  CLOSE_RESULT_NOT_FOUND = 2;
-  // The object was already closed and nothing changed.
-  CLOSE_RESULT_ALREADY_CLOSED = 3;
-  // There was some issue closing this item, specified in the message.
-  CLOSE_RESULT_FAILED = 4;
-  CLOSE_RESULT_OTHER = 100;
 }
 
 // Each transaction must specify a transaction type to indicate how money was moved. These are presently

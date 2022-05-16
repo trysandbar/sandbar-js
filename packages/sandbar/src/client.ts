@@ -10,11 +10,12 @@ import {
   CompleteEntityCreate,
   Entity,
   translateEntityResponse,
-} from "./translators/translate-entity-response"
+} from "./translators/translate-entity"
 import { translateAccount } from "./translators/translate-account"
 import { translateTransaction } from "./translators/translate-transaction"
 import { IMessageType } from "@protobuf-ts/runtime"
-import { translateInvestigation } from "./translators/translate-investigation"
+import { translateRuleOutput } from "./translators/translate-rule-output"
+import { translateEvent } from "./translators/translate-event"
 
 function base64encode(input: string) {
   return Buffer.from(input, "utf8").toString("base64")
@@ -56,18 +57,6 @@ export type SubmitEventsResponse = Omit<
    * Collection of event responses
    */
   responses: EventResponse[]
-}
-
-/**
- * A response containing requested entity information.
- *
- * Based on protobuf message sandbar.v0.GetEntityResponse
- */
-export type GetEntityResponse = Omit<publicapi.GetEntityResponse, "entity"> & {
-  /**
-   * Collection of entity responses
-   */
-  entities: Entity[]
 }
 
 type Method<I extends object, O extends object> = {
@@ -129,7 +118,7 @@ export class Client {
    * @returns collection of results for each event received by API server
    */
   async submitEvents(events: Event[]): Promise<SubmitEventsResponse> {
-    const { message, responses: grpcResponses } = await this.callMethod(
+    const { responses: grpcResponses, ...remainder } = await this.callMethod(
       methods.SubmitEvents,
       {
         events,
@@ -137,101 +126,26 @@ export class Client {
     )
     const responses = grpcResponses.map(translateEventResponse)
     return {
-      message,
       responses,
+      ...remainder,
     }
   }
 
-  /**
-   * This simple endpoint just takes in and returns entities.
-   *
-   * Based on protobuf rpc: GetEntity
-   *
-   * @param entityIds IDs of the entities to query for
-   * @returns Collection of entities specified by the parameter
-   */
-  async getEntities(
-    entityIds: publicapi.EntityQueryIdParam["entityId"][]
-  ): Promise<GetEntityResponse> {
-    const { message, entity: grpcEntities } = await this.callMethod(
-      methods.GetEntity,
-      {
-        request: {
-          ids: entityIds.map((entityId) => ({ entityId })),
-        },
-      }
-    )
-    const entities = grpcEntities.map(translateEntityResponse)
+  async submitEventSync(
+    event: Event
+  ): Promise<publicapi.SubmitEventAndGetRuleOutputsResponse> {
+    const {
+      ruleOutputs: grpcRuleOutputs,
+      request: grpcEvent,
+      ...remainder
+    } = await this.callMethod(methods.SubmitEventAndGetRuleOutputs, {
+      event,
+    })
+    const ruleOutputs = grpcRuleOutputs.map(translateRuleOutput)
+    const request = translateEvent(grpcEvent)
     return {
-      message,
-      entities,
-    }
-  }
-
-  /**
-   * This end point is used to get information about the given accounts.
-   *
-   * @param accountIds IDs of the accounts to query for
-   * @returns Collection of accounts specified by the parameter
-   */
-  async getAccounts(
-    accountIds: publicapi.AccountQueryIdParam["id"][]
-  ): Promise<publicapi.GetAccountResponse> {
-    const { message, accounts: grpcAccounts } = await this.callMethod(
-      methods.GetAccount,
-      {
-        id: accountIds.map((id) => ({ id })),
-      }
-    )
-    const accounts = grpcAccounts.map(translateAccount)
-    return {
-      message,
-      accounts,
-    }
-  }
-
-  /**
-   * This endpoint will return all the transactions for a given entity.
-   *
-   * Basede on protobuf rpc: GetTransactionsForEntity
-   *
-   * @param entityId ID of entity to get the transactions for
-   * @returns Collection of transactions associated with the given entity
-   */
-  async getTransactionsForEntity(
-    entityId: publicapi.EntityQueryIdParam["entityId"]
-  ): Promise<publicapi.GetTransactionsForEntityResponse> {
-    const { transactions: grpcTransactions, message } = await this.callMethod(
-      methods.GetTransactionsForEntity,
-      {
-        id: { entityId },
-      }
-    )
-    const transactions = grpcTransactions.map(translateTransaction)
-    return {
-      transactions,
-      message,
-    }
-  }
-
-  /**
-   * This query will return all investigations for an entity.
-   *
-   * Based on protobuf rpc: GetAllInvestigations
-   *
-   * @param options
-   * @param options.includeClosed If set to true, include closed investigations in the result. Defaults to false
-   * @returns Collection of investigations specified by the options
-   */
-  async getAllInvestigations(
-    options?: publicapi.GetAllInvestigationsRequest_Options
-  ): Promise<publicapi.GetAllInvestigationsResponse> {
-    const { investigations: grpcInvestigations, message } =
-      await this.callMethod(methods.GetAllInvestigations, { options })
-    const investigations = grpcInvestigations.map(translateInvestigation)
-    return {
-      investigations,
-      message,
+      ruleOutputs,
+      ...remainder,
     }
   }
 

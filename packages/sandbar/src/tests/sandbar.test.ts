@@ -2,6 +2,7 @@ import fetchMock from "jest-fetch-mock"
 jest.setMock("cross-fetch", fetchMock)
 
 import * as sandbar from "../"
+import { Status } from "../generated/private/google/rpc/status"
 import * as grpc from "../generated/private/sandbar"
 
 beforeEach(() => {
@@ -14,7 +15,11 @@ test("well-formed submit request succeeds", async () => {
     /https:\/\/hello\.dev\.sandbar\.ai\/v0\/submit_event\/?/,
     async (_req) => {
       return JSON.stringify({
-        message: "success",
+        status: {
+          code: 0,
+          message: "",
+          details: [],
+        },
       })
     }
   )
@@ -42,41 +47,43 @@ test("well-formed submit request succeeds", async () => {
   ])
 })
 
+const status: Status = {
+  code: 0,
+  message: "",
+  details: [],
+}
+
 test("creat new entities, accounts, links, and transaction", async () => {
   const resp: grpc.SubmitEventsResponse = {
-    message: "success",
+    status,
     responses: [
       {
         eventResponseType: sandbar.EventResponseType.ENTITY,
         sandbarId: "1",
         sourceId: "test-person",
-        isSuccessful: true,
-        message: "",
         generatedId: "",
+        status,
       },
       {
         eventResponseType: sandbar.EventResponseType.ACCOUNT,
         sandbarId: "1",
         sourceId: "Lendbar Bank|1234",
-        isSuccessful: true,
-        message: "",
         generatedId: "",
+        status,
       },
       {
         eventResponseType: sandbar.EventResponseType.ACCOUNT_ENTITY_LINK,
         sandbarId: "1",
         sourceId: "",
-        isSuccessful: true,
-        message: "",
         generatedId: "",
+        status,
       },
       {
         eventResponseType: sandbar.EventResponseType.TRANSACTION,
         sandbarId: "1",
         sourceId: "abc",
-        isSuccessful: true,
-        message: "",
         generatedId: "",
+        status,
       },
     ],
   }
