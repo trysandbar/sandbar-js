@@ -158,14 +158,6 @@ message Entity {
   optional string phone_number = 13;
 }
 
-// Query containing entity information.
-message EntityQuery {
-  // A parameter containing information needed to identify an entity.
-  repeated EntityQueryIdParam ids = 1;
-  reserved 2, 3;
-  reserved "knowledge_date", "effective_date";
-}
-
 /* @exclude ACCOUNT SECTION */
 
 // Information sufficient to identify a given account.
@@ -192,15 +184,6 @@ message Account {
   optional string account_open_date = 6;
   // The date a given account was closed.
   optional string account_close_date = 7;
-}
-
-message AccountQueryIdParam {
-  oneof id {
-    // A sandbar ID for a given account.
-    string sandbar_account_id = 1;
-    // The information used to uniquely identify an account at a given point in time.
-    AccountIdentifier account_identifier = 2;
-  }
 }
 
 // A transaction may go through many different states in its lifetime. This represents the different
@@ -335,14 +318,6 @@ message RuleOutput {
   reserved "knowledge_date", "effective_date";
 }
 
-// A response containing rule outputs for a given investigation target.
-message RuleOutputResponse {
-  // Identifies the investigation target the rule ran against.
-  InvestigationTarget investigation_target = 1;
-  // Rule outputs associated with the given investigation target.
-  repeated RuleOutput output = 2;
-}
-
 /* Account-Entity Links */
 message AccountEntityLink {
   // Sandbar ID for the given link. Expected in any change or delete event, but not in a create event.
@@ -400,89 +375,6 @@ enum EventType {
   EVENT_TYPE_DELETE = 3;
 }
 
-// In an Alert, a Next Step is a suggested course of action that an analyst may take to
-// either confirm or alleviate the given described risk.
-message NextStep {
-  // A description of the action to be taken.
-  string description = 1;
-}
-
-// When a rule creates an output that is deemed sufficiently risky, we create an alert.
-// Alerts can also be created due to manually uploaded reports of potential risks.
-// An alert groups all relevant information after the initial trigger into one place.
-// For a single investigation, all associated manual reports will be grouped into one alert.
-message Alert {
-  // Sandbar identifier for a given alert.
-  string sandbar_alert_id = 1;
-  oneof trigger {
-    // Rule outputs that triggered the alert
-    RuleOutputsForAlert rule_outputs = 2;
-    // Manual reports of risk that triggered the alert
-    ManualReportsForAlert manual_reports = 3;
-  }
-  // The investigation target associated with this alert.
-  InvestigationTarget investigation_target = 4;
-  // Set of next steps a user may be able to take to help assess the risk associated with a given alert and help an analyst decide whether or not to file a SAR.
-  repeated NextStep next_steps = 5;
-  // High water mark within look-back window
-  double high_water_mark_risk_score = 6;
-  // The status of the investigation into the alert.
-  InvestigationStatus status = 7;
-}
-
-// Information about a rule that triggered an alert
-message RuleOutputsForAlert {
-  // Set of rule outputs for the rule that triggered the alert
-  repeated RuleOutput rule_outputs = 1;
-  // A human readable name of the rule associated with the Alert. Not present if the alert is the result
-  // of user-entered risk information.
-  string rule = 2;
-  // This indicates a version of a given rule that is being run.
-  int64 rule_version = 3;
-}
-
-// A list of manual reports that triggered an alert
-message ManualReportsForAlert {
-  // The manual reports
-  repeated ManualReport manual_reports = 1;
-}
-
-// An investigation is a unit of work comprised of one or more alerts. This is the thing that an analyst or a group
-// of analysts should be working on. There may be one or more targets, and one or more types of risk topographies.
-// By default an investigation groups alerts on a given investigation unit.
-message Investigation {
-  // Sandbar ID of the given investigation.
-  string sandbar_investigation_id = 1;
-  // Set of alerts associated with the investigation.
-  repeated Alert alerts = 2;
-  // The targets of a given investigation.
-  repeated InvestigationTarget target = 3;
-  // The status of the investigation.
-  InvestigationStatus status = 4;
-}
-
-// The status of a given investigation.
-enum InvestigationStatus {
-  INVESTIGATION_STATUS_UNSPECIFIED = 0;
-  // An open investigation that requires attention.
-  INVESTIGATION_STATUS_OPEN = 1;
-  // An investigation that has been automatically closed by Sandbar due to its age.
-  INVESTIGATION_STATUS_AUTO_CLOSED = 2;
-  // An investigation that has been manually closed by a user upon assessment that the activity
-  // does not warrant a SAR filing.
-  INVESTIGATION_STATUS_MANUALLY_CLOSED_CLEARED = 3;
-  // An investigation that has been manually closed by a user upon assessment that the activity
-  // is suspicious and requires a SAR filing.
-  INVESTIGATION_STATUS_MANUALLY_CLOSED_SUSPICIOUS = 4;
-  // An investigation that is oh hold pending some internal or external action necessary
-  // to continue the assessment.
-  INVESTIGATION_STATUS_ON_HOLD = 5;
-  // An investigation that is in the process of being worked on by an investigator.
-  INVESTIGATION_STATUS_IN_PROGRESS = 6;
-  // Another investigation status that is not specified here.
-  INVESTIGATION_STATUS_OTHER = 100;
-}
-
 // Identifying information about a given entity.
 message EntityQueryIdParam {
   oneof entity_id {
@@ -495,146 +387,9 @@ message EntityQueryIdParam {
   }
 }
 
-// Identifying information about an entity as an Investigation Target
-message TargetEntityId {
-  // Sandbar entity ID for the given investigation target.
-  string sandbar_entity_id = 1;
-  // Entity ID in the source system for the given investigation target.
-  optional string source_entity_id = 2;
-  // Sandbar generated ID for incomplete entities for the given investigation target.
-  optional string generated_entity_id = 3;
-}
-
 // Information about a target of an investigation.
 message InvestigationTarget {
   string sandbar_target_id = 1;
-}
-
-// A user-generated comment on an object in our system
-message Comment {
-  // The sandbar-generated unique id for the comment
-  string sandbar_comment_id = 1;
-  // The text of the comment
-  string contents = 2;
-  // The sandbar-generated unique ID for the object the comment references
-  string subject_sandbar_id = 3;
-  // The time the comment was first created
-  string created_time = 4;
-  // The time the comment was most recently updated
-  string updated_time = 5;
-}
-
-// A tag that can be associated with an object
-message Tag {
-  // The sandbar-generated unique ID for the tag
-  string tag_sandbar_id = 1;
-  // The contents of the tag
-  string contents = 2;
-}
-
-// Information about a tag associated with an object
-message TagObjectLink {
-  // The sandbar-generated unique ID for the tag-object link
-  string sandbar_id = 1;
-  // The sandbar-generated unique ID for the tag
-  string tag_sandbar_id = 2;
-  // The sandbar-generated unique ID for the object associated with the tag
-  string subject_sandbar_id = 3;
-  // The contents of the tag
-  string contents = 4;
-  // The time the tag was associated with the object
-  string time = 5;
-}
-
-// A list of tag-object links
-message TagObjectLinkList {
-  // The tag object links
-  repeated TagObjectLink tag_object_links = 1;
-}
-
-message Analysis {
-  // The subject's sandbar-generated unique ID
-  string subject_sandbar_id = 1;
-  // The contents of the subject's analysis
-  string contents = 2;
-}
-
-// A response containing a URL to download the contents of an attachment from.
-message AttachmentDownloadLink {
-  // Information about processing the request, including any error information
-  google.rpc.Status status = 1;
-  // The URL at which the attachment can be downloaded.
-  string url = 2;
-}
-
-// Information about an attachment uploaded to Sandbar
-message Attachment {
-  // The Sandbar-generated unique ID for the attachment
-  string attachment_sandbar_id = 1;
-  // The attachment's file name
-  string file_name = 2;
-  // The attachment's content type
-  string content_type = 3;
-}
-
-// Information about an attachment associated with an object
-message AttachmentObjectLink {
-  // The sandbar-generated unique ID for the attachment-object link
-  string attachment_object_link_sandbar_id = 1;
-  // The sandbar-generated unique ID for the object the attachment is associated with
-  string object_sandbar_id = 2;
-  // The attachment
-  Attachment attachment = 3;
-}
-
-// A list of attachment-object links
-message AttachmentObjectLinkList {
-  // Information about processing the request, including any error information
-  google.rpc.Status status = 1;
-  // The attachment object links
-  repeated AttachmentObjectLink attachment_object_links = 2;
-}
-
-// Categorizations for the level of risk for a manual report
-enum ManualReportRiskLevel {
-  MANUAL_REPORT_RISK_LEVEL_UNSPECIFIED = 0;
-  MANUAL_REPORT_RISK_LEVEL_LOW = 1;
-  MANUAL_REPORT_RISK_LEVEL_MEDIUM = 2;
-  MANUAL_REPORT_RISK_LEVEL_HIGH = 3;
-}
-
-// Information about manually uploaded risk information
-message ManualReport {
-  // Identifies the investigation target the report applies to.
-  InvestigationTarget investigation_target = 1;
-  // A narrative about the nature of the risk and how it was identified
-  optional string narrative = 2;
-  // A categorization of the level of risk posed
-  ManualReportRiskLevel risk_level = 3;
-  // The name of the person who reported the risk
-  optional string reporter_name = 4;
-  // Your institution's identifier for the person who reported the risk
-  optional string reporter_id = 5;
-  // The person who reported the risk's email address
-  optional string reporter_email_address = 6;
-  // The time when the manual report was created
-  string timestamp = 7;
-  // The sandbar-generated unique ID of the alert this manual report triggered
-  string sandbar_alert_id = 8;
-}
-
-// The various possible results of a request to close an alert or investigation.
-enum CloseResult {
-  CLOSE_RESULT_UNSPECIFIED = 0;
-  // The item was successfully closed.
-  CLOSE_RESULT_SUCCESSFUL = 1;
-  // The object was not found.
-  CLOSE_RESULT_NOT_FOUND = 2;
-  // The object was already closed and nothing changed.
-  CLOSE_RESULT_ALREADY_CLOSED = 3;
-  // There was some issue closing this item, specified in the message.
-  CLOSE_RESULT_FAILED = 4;
-  CLOSE_RESULT_OTHER = 100;
 }
 
 // Each transaction must specify a transaction type to indicate how money was moved. These are presently
