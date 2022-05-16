@@ -7,8 +7,8 @@ Example of how to consume the sandbar library in typescript.
 This example runs via the command-line. It prints its progress and results to
 stdout.
 
-You can invoke the example via lerna:
+You can invoke the example via pnpm:
 
 ```sh
-lerna run --scope example-ts dev -- -- --url "http://localhost:10000"
+pnpm --filter example-ts run dev --url "http://localhost:10000"
 ```
