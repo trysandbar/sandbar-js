@@ -26,256 +26,6 @@ service SandbarApiService {
       body: "*"
     };
   }
-
-  // This simple endpoint just takes in and returns an entity.
-  rpc GetEntity(GetEntityRequest) returns (GetEntityResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_entity"
-      body: "*"
-    };
-  }
-
-  // This end point is used to get information about a given account.
-  rpc GetAccount(GetAccountRequest) returns (GetAccountResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_account"
-      body: "*"
-    };
-  }
-
-  // This is to retrieve the set of latest rule outputs for a given entity for all rules.
-  rpc GetRuleOutputForEntities(GetRuleOutputForEntitiesRequest) returns (GetRuleOutputForEntitiesResponse) {
-    option (google.api.http) = {
-      post: "/v0/results_for_entities"
-      body: "*"
-    };
-  }
-
-  // This endpoint retrieves all the accounts that are associated with a given entity.
-  rpc GetAccountsForEntity(GetAccountsForEntityRequest) returns (GetAccountsForEntityResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_accounts_for_entity"
-      body: "*"
-    };
-  }
-
-  // This endpoint will return all the transactions for a given entity.
-  rpc GetTransactionsForEntity(GetTransactionsForEntityRequest) returns (GetTransactionsForEntityResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_transactions_for_entity"
-      body: "*"
-    };
-  }
-
-  // This query will return a set of specified alerts.
-  rpc GetAlerts(GetAlertsRequest) returns (GetAlertsResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_alerts"
-      body: "*"
-    };
-  }
-
-  // This query will return a set of specified investigations.
-  rpc GetInvestigations(GetInvestigationsRequest) returns (GetInvestigationsResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_investigations"
-      body: "*"
-    };
-  }
-
-  // This query will return all investigations for an entity.
-  rpc GetAllInvestigations(GetAllInvestigationsRequest) returns (GetAllInvestigationsResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_all_investigations"
-      body: "*"
-    };
-  }
-
-  // This allows a user to manually close a given alert. If this closes the last open alert in
-  // an investigation, this call will close the enclolsed investigation as well.
-  rpc CloseAlert(CloseAlertRequest) returns (CloseAlertResponse) {
-    option (google.api.http) = {
-      post: "/v0/close_alert"
-      body: "*"
-    };
-  }
-
-  // This allows a user to manually close a given investigation. This will close all enclosed
-  // alerts that remain open.
-  rpc CloseInvestigation(CloseInvestigationRequest) returns (CloseInvestigationResponse) {
-    option (google.api.http) = {
-      post: "/v0/close_investigation"
-      body: "*"
-    };
-  }
-
-  // This is to retrieve the history of rule output for a given entity for all rules.
-  // Entity search arg because we are essentially looking up the entity where we
-  // then have to
-  rpc GetRuleOutputHistoryForEntity(GetRuleOutputHistoryForEntityRequest) returns (GetRuleOutputHistoryForEntityResponse) {
-    option (google.api.http) = {
-      post: "/v0/results_history_for_entity"
-      body: "*"
-    };
-  }
-
-  // Create a comment for a specified object
-  rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {
-    option (google.api.http) = {
-      post: "/v0/create_comment"
-      body: "*"
-    };
-  }
-
-  // Update the contents of an existing comment
-  rpc UpdateComment(UpdateCommentRequest) returns (UpdateCommentResponse) {
-    option (google.api.http) = {
-      post: "/v0/update_comment"
-      body: "*"
-    };
-  }
-
-  // Retrieves all comments for the specified investigation
-  rpc GetCommentsForInvestigation(GetCommentsForInvestigationRequest) returns (GetCommentsForInvestigationResponse) {
-    option (google.api.http) = {
-      post: "/v0/comments_for_investigation"
-      body: "*"
-    };
-  }
-
-  // Retrieves all comments for the specified alert
-  rpc GetCommentsForAlert(GetCommentsForAlertRequest) returns (GetCommentsForAlertResponse) {
-    option (google.api.http) = {
-      post: "/v0/comments_for_alert"
-      body: "*"
-    };
-  }
-
-  // Associates a tag with an object (either an investigation or an alert)
-  rpc AddTagToObject(AddTagToObjectRequest) returns (AddTagToObjectResponse) {
-    option (google.api.http) = {
-      post: "/v0/add_tag_to_object"
-      body: "*"
-    };
-  }
-
-  // Removes the association between a tag and an object
-  rpc RemoveTagFromObject(RemoveTagFromObjectRequest) returns (RemoveTagFromObjectResponse) {
-    option (google.api.http) = {
-      post: "/v0/remove_tag_from_object"
-      body: "*"
-    };
-  }
-
-  // Gets all tags associated with an object
-  rpc GetTagsForObjects(GetTagsForObjectsRequest) returns (GetTagsForObjectsResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_tags_for_objects"
-      body: "*"
-    };
-  }
-
-  // Lists all tags that have been associated with objects
-  rpc ListTags(ListTagsRequest) returns (ListTagsResponse) {
-    option (google.api.http) = {
-      post: "/v0/list_tags"
-      body: "*"
-    };
-  }
-
-  // Updates the analysis associated with an object (must be an investigation)
-  rpc UpdateAnalysis(UpdateAnalysisRequest) returns (UpdateAnalysisResponse) {
-    option (google.api.http) = {
-      post: "/v0/update_analysis"
-    };
-  }
-
-  // Gets the analyses associated with the specified objects
-  rpc GetAnalysesForObjects(GetAnalysesForObjectsRequest) returns (GetAnalysesForObjectsResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_analysis_for_objects"
-    };
-  }
-
-  // Creates a link between a file and an investigation or an alert in our system.
-  // This method returns an upload link to submit the file's contents.
-  rpc AddAttachment(AddAttachmentRequest) returns (AddAttachmentResponse) {
-    option (google.api.http) = {
-      post: "/v0/add_attachment"
-    };
-  }
-
-  // Gets URLs at which the contents of previously uploaded attachments can be found
-  rpc GetAttachmentDownloadUrls(GetAttachmentDownloadUrlsRequest) returns (GetAttachmentDownloadUrlsResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_attachment_download_urls"
-    };
-  }
-
-  // Associates an attachment that has already been associated with an investigation or alert
-  // with another such object in our system. The existing attachment can be referenced by the
-  // Sandbar-generated unique ID returned by the AddAttachment call.
-  rpc AddAttachmentToObject(AddAttachmentToObjectRequest) returns (AddAttachmentToObjectResponse) {
-    option (google.api.http) = {
-      post: "/v0/add_attachment_to_object"
-      body: "*"
-    };
-  }
-
-  // Removes the association between an attachment and an object. If an attachment is no longer associated
-  // with any object, it will be deleted from our records.
-  rpc RemoveAttachmentFromObject(RemoveAttachmentFromObjectRequest) returns (RemoveAttachmentFromObjectResponse) {
-    option (google.api.http) = {
-      post: "/v0/remove_attachment_from_object"
-      body: "*"
-    };
-  }
-
-  // Gets all attachments associated with an object
-  rpc GetAttachmentsForObjects(GetAttachmentsForObjectsRequest) returns (GetAttachmentsForObjectsResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_attachments_for_objects"
-      body: "*"
-    };
-  }
-
-  // Adds information about a user-determined risk.
-  rpc AddManualReport(AddManualReportRequest) returns (AddManualReportResponse) {
-    option (google.api.http) = {
-      post: "/v0/add_manual_report"
-      body: "*"
-    };
-  }
-
-  // Highlights an object as significant to an investigation or alert
-  rpc HighlightObjectForInvestigationOrAlert(HighlightObjectForInvestigationOrAlertRequest) returns (HighlightObjectForInvestigationOrAlertResponse) {
-    option (google.api.http) = {
-      post: "/v0/highlight_object_for_investigation_or_alert"
-      body: "*"
-    };
-  }
-
-  // Removes a highlighted object from an investigation or alert
-  rpc RemoveHighlightedObject(RemoveHighlightedObjectRequest) returns (RemoveHighlightedObjectResponse) {
-    option (google.api.http) = {
-      post: "/v0/remove_highlighted_object"
-      body: "*"
-    };
-  }
-
-  // Lists all highlighted objects for an investigation or alert
-  rpc GetHighlightedObjects(GetHighlightedObjectsRequest) returns (GetHighlightedObjectsResponse) {
-    option (google.api.http) = {
-      post: "/v0/get_highlighted_objects"
-      body: "*"
-    };
-  }
-}
-
-// Message containing a detailed error response
-message ErrorDetails {
-  // The details of the error
-  string details = 1;
 }
 
 /* @exclude EVENT SECTION */
@@ -416,27 +166,6 @@ message EntityQuery {
   reserved "knowledge_date", "effective_date";
 }
 
-// A request containing information necessary to get rule outputs for a given entity.
-message GetRuleOutputForEntitiesRequest {
-  // Specifies which entities to request for rule outputs for.
-  EntityQuery request = 1;
-}
-
-// A request containing information necessary to get a given entity.
-message GetEntityRequest {
-  // Specifies entities to request detailed information on.
-  EntityQuery request = 1;
-}
-
-// A response containing requested entity information.
-message GetEntityResponse {
-  // Contents the entities requested.
-  repeated Entity entity = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
 /* @exclude ACCOUNT SECTION */
 
 // Information sufficient to identify a given account.
@@ -474,22 +203,6 @@ message AccountQueryIdParam {
   }
 }
 
-// The request sent when trying to get a specific account from sandbar.
-message GetAccountRequest {
-  repeated AccountQueryIdParam id = 1;
-  reserved 3, 4;
-  reserved "knowledge_date", "effective_date";
-}
-
-// Response containing requested account related information and a message.
-message GetAccountResponse {
-  // Set of accounts
-  repeated Account accounts = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
 // A transaction may go through many different states in its lifetime. This represents the different
 // stages of a life cycle. A user may update the state on a single transaction over time as it transitions.
 enum TransactionStatus {
@@ -523,21 +236,6 @@ enum AccountType {
   ACCOUNT_TYPE_BROKERAGE = 4;
   // Another account type not specified here.
   ACCOUNT_TYPE_OTHER = 100;
-}
-
-// A request payload that allows a user to get a set of accounts for a given entity.
-message GetAccountsForEntityRequest {
-  // Information about the entity qe are trying to get accounts for.
-  EntityQueryIdParam id = 1;
-}
-
-// A response payload that contains information about a set of accounts owned by a single entity.
-message GetAccountsForEntityResponse {
-  // Set of accounts
-  repeated Account accounts = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
 }
 
 /* TRANSACTION */
@@ -616,21 +314,6 @@ message Transaction {
   optional int32 counterparty_routing_number = 35;
 }
 
-// A set of transactions associated with a requested entity.
-message GetTransactionsForEntityResponse {
-  // Set of requested transactions.
-  repeated Transaction transactions = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request that allows a user to get all the transactions associated with a given entity.
-message GetTransactionsForEntityRequest {
-  // Specifies the entity to request information on.
-  EntityQueryIdParam id = 1;
-}
-
 /* RULE OUTPUT */
 // Certain actions prompt sandbar to run our suite of rules against an investigation target.
 // Each time this happens, a rule output is generated with information about the risk assessed
@@ -658,30 +341,6 @@ message RuleOutputResponse {
   InvestigationTarget investigation_target = 1;
   // Rule outputs associated with the given investigation target.
   repeated RuleOutput output = 2;
-}
-
-//
-message GetRuleOutputForEntitiesResponse {
-  // Requested rule outputs.
-  repeated RuleOutputResponse responses = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request payload that contains entity information used to get rule output history for that entity.
-message GetRuleOutputHistoryForEntityRequest {
-  // Specifies the entity to request information on.
-  EntityQueryIdParam id = 1;
-}
-
-// A message containing a history of rule outputs for a given entity.
-message GetRuleOutputHistoryForEntityResponse {
-  // All rule outputs generated throughout history for a given entity.
-  RuleOutputResponse response = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
 }
 
 /* Account-Entity Links */
@@ -824,41 +483,6 @@ enum InvestigationStatus {
   INVESTIGATION_STATUS_OTHER = 100;
 }
 
-// Request for one or more alerts.
-message GetAlertsRequest {
-  // Sandbar IDs for requested alerts.
-  repeated string sandbar_alert_id = 1;
-}
-
-// Response containing requested alerts.
-message GetAlertsResponse {
-  // Requested alerts.
-  repeated Alert alerts = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// An unfiltered request for investigations.
-message GetAllInvestigationsRequest {
-  // Options for the investigation request.
-  message Options {
-    // If set to `true`, the response will include closed investigations.
-    bool include_closed = 1;
-  }
-  // Options for a given investigation request.
-  optional Options options = 1;
-}
-
-// A response sent in response to a request for all investigations.
-message GetAllInvestigationsResponse {
-  // The set of requested investigations.
-  repeated Investigation investigations = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
 // Identifying information about a given entity.
 message EntityQueryIdParam {
   oneof entity_id {
@@ -886,119 +510,6 @@ message InvestigationTarget {
   string sandbar_target_id = 1;
 }
 
-// A request for a set of investigations
-message GetInvestigationsRequest {
-  // Sandbar IDs of investigations to request detailed information on.
-  repeated string sandbar_investigation_id = 1;
-}
-
-// A response containing the requested set of investigations.
-message GetInvestigationsResponse {
-  // Set of requested investigations.
-  repeated Investigation investigation = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request to close an alert.
-message CloseAlertRequest {
-  // Sandbar identifier of alert to be closed.
-  string sandbar_alert_id = 1;
-}
-
-// A response carrying information about the result of a request to close an alert.
-message CloseAlertResponse {
-  // Information about the disposition of the closed alert.
-  CloseResult result = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request to close an investigation.
-message CloseInvestigationRequest {
-  // Sandbar identifier of investigation to be closed.
-  string sandbar_investigation_id = 1;
-}
-
-// A response carrying information about the result of a request to close an investigation.
-message CloseInvestigationResponse {
-  // Information about the disposition of the closed investigation.
-  CloseResult result = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request containing the contents of a comment
-// and the sandbar ID and type of the object
-// the comment is for
-// (must be an alert or investigation)
-message CreateCommentRequest {
-  // The sandbar ID of the subject
-  string subject_sandbar_id = 1;
-  // The contents of the comment
-  string contents = 2;
-}
-
-// A response containing information about a newly created comment
-message CreateCommentResponse {
-  // The sandbar ID of the created comment
-  string sandbar_comment_id = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request containing the updated contents
-// of an existing comment
-message UpdateCommentRequest {
-  // The sandbar ID of the comment to update
-  string sandbar_comment_id = 1;
-  // The new contents of the comment
-  string contents = 3;
-}
-
-// A response carrying information about the result of a request to update a comment.
-message UpdateCommentResponse {
-  // The sandbar ID of the updated comment
-  string sandbar_comment_id = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request for all comments associated with an investigation
-message GetCommentsForInvestigationRequest {
-  // The sandbar ID of the investigation to fetch comments for
- string sandbar_investigation_id = 1;
-}
-
-// A response containing all comments for the requested investigation
-message GetCommentsForInvestigationResponse {
-  // All comments on the investigation
-  repeated Comment comments = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request for all comments associated with an alert
-message GetCommentsForAlertRequest {
-  // The sandbar ID of the alert to fetch comments for
-  string sandbar_alert_id = 1;
-}
-
-// A response containing all comments for the requested alert
-message GetCommentsForAlertResponse {
-  // All comments on the alert
-  repeated Comment comments = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
 // A user-generated comment on an object in our system
 message Comment {
   // The sandbar-generated unique id for the comment
@@ -1011,77 +522,6 @@ message Comment {
   string created_time = 4;
   // The time the comment was most recently updated
   string updated_time = 5;
-}
-
-// A request to associate a a tag with an object (must be an alert or an investigation)
-message AddTagToObjectRequest {
-  // The sandbar-generated unique ID for the object to associate the tag with
-  string subject_sandbar_id = 1;
-  oneof tag {
-    // The contents of the tag
-    string tag_contents = 2;
-    // The sandbar-generated unique ID for an existing tag
-    string tag_sandbar_id = 3;
-  }
-}
-
-// A response containing information about the tag associated with an object
-message AddTagToObjectResponse {
-  // The sandbar-generated unique ID for the tag-object link
-  string tag_object_link_sandbar_id = 1;
-  // The sandbar-generated unique ID for the tag
-  string tag_sandbar_id = 2;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 3;
-}
-
-// A request to remove an association between a tag and an object
-message RemoveTagFromObjectRequest {
-  // The sandbar-generated unique ID for the object the tag is associated with
-  string subject_sandbar_id = 1;
-  // The contents of the tag to remove from the object
-  oneof tag {
-    // The contents of the tag
-    string tag_contents = 2;
-    // The sandbar-generated unique ID for an existing tag
-    string tag_sandbar_id = 3;
-  }
-}
-
-// A response confirming a tag is no longer associated with an object
-message RemoveTagFromObjectResponse {
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 1;
-}
-
-// A request for all tags associated with the specified objects
-message GetTagsForObjectsRequest {
-  // The sandbar-generated unique IDs of the objects
-  repeated string subject_sandbar_ids = 1;
-}
-
-message GetTagsForObjectsResponse {
-  // A mapping between objects' unique sandbar-generated IDs and a list of tags associated with them
-  map<string, TagObjectLinkList> tags_by_subject_sandbar_id = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
-}
-
-// A request to list all tags that have been associated with objects
-message ListTagsRequest {
-
-}
-
-// A response containing all tags that have been associated with objects
-message ListTagsResponse {
-  // The tags
-  repeated Tag tags = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
 }
 
 // A tag that can be associated with an object
@@ -1112,78 +552,11 @@ message TagObjectLinkList {
   repeated TagObjectLink tag_object_links = 1;
 }
 
-// A request to update the contents of the analysis for an object specified by the ID.
-message UpdateAnalysisRequest {
-  // The subject's sandbar-generated unique ID
-  string subject_sandbar_id = 1;
-  // The new contents of the subject's analysis
-  string contents = 2;
-}
-
-// A response containing the updated analysis
-message UpdateAnalysisResponse {
-  // The analysis for the subject with the updated contents
-  Analysis analysis = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states.
-  string message = 2;
-}
-
-// A request for the analyses for one or more objects
-message GetAnalysesForObjectsRequest {
-  // The sandbar-generated unique IDs of the objects
-  repeated string subject_sandbar_ids = 1;
-}
-
-// A response containing the analyses for the specified objects.
-message GetAnalysesForObjectsResponse {
-  // A mapping between objects' unique sandbar-generated IDs and the analyses associated with them
-  map<string, Analysis> analyses_by_subject_sandbar_id = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states.
-  string message = 2;
-}
-
 message Analysis {
   // The subject's sandbar-generated unique ID
   string subject_sandbar_id = 1;
   // The contents of the subject's analysis
   string contents = 2;
-}
-
-// A request to upload a file that can be associated with other objects
-message AddAttachmentRequest {
-  // The name of the file
-  string file_name = 1;
-  // The file's HTTP MIME type, see https://datatracker.ietf.org/doc/html/rfc6838
-  string content_type = 2;
-  // The sandbar-generated unique ID of the object to associate the attachment with (must be an investigation or an alert)
-  string object_sandbar_id = 3;
-}
-
-// A response containing information about the added attachment,
-// including a URL to upload the contents of the file to.
-message AddAttachmentResponse {
-  // Information about processing the request, including any error information
-  google.rpc.Status status = 1;
-  // The sandbar-generated unique ID for the attachment
-  string attachment_sandbar_id = 2;
-  // A URL to upload the contents of the attachment file
-  string url = 3;
-}
-
-// A request for a link that can be used to download previously uploaded attachments
-message GetAttachmentDownloadUrlsRequest {
-  // The sandbar-generated unique ID of the attachment
-  repeated string attachment_sandbar_ids = 1;
-}
-
-// A response containing URLs for retrieving the contents of previously uploaded attachments.
-message GetAttachmentDownloadUrlsResponse {
-  // Information about processing the request, including any error information
-  google.rpc.Status status = 1;
-  // A mapping between attachment's sandbar-generated unique IDs and URLs at which their contents can be found
-  map<string, AttachmentDownloadLink> urls_by_attachment_sandbar_id = 2;
 }
 
 // A response containing a URL to download the contents of an attachment from.
@@ -1192,51 +565,6 @@ message AttachmentDownloadLink {
   google.rpc.Status status = 1;
   // The URL at which the attachment can be downloaded.
   string url = 2;
-}
-
-// A request to associate an attachment with an object (must be an alert or an investigation)
-message AddAttachmentToObjectRequest {
-  // The sandbar-generated unique ID for the object to associate the attachment with
-  string object_sandbar_id = 1;
-  // The sandbar-generated unique ID for the attachment
-  string attachment_sandbar_id = 2;
-}
-
-// A response containing information about the attachment associated with an object
-message AddAttachmentToObjectResponse {
-  // Information about processing the request, including any error information
-  google.rpc.Status status = 1;
-  // The sandbar-generated unique ID for the attachment-object link
-  string attachment_object_link_sandbar_id = 2;
-}
-
-// A request to remove an association between a attachment and an object
-message RemoveAttachmentFromObjectRequest {
-  // The sandbar-generated unique ID for the object the attachment is associated with
-  string object_sandbar_id = 1;
-  // The sandbar-generated unique ID for the attachment
-  string attachment_sandbar_id = 3;
-}
-
-// A response confirming a attachment is no longer associated with an object
-message RemoveAttachmentFromObjectResponse {
-  // Information about processing the request, including any error information
-  google.rpc.Status status = 1;
-}
-
-// A request for all attachments associated with the specified objects
-message GetAttachmentsForObjectsRequest {
-  // The sandbar-generated unique IDs of the objects
-  repeated string object_sandbar_ids = 1;
-}
-
-// A response containing all attachments for objects, indexed by the sandbar-generated
-// unique ID for each object
-message GetAttachmentsForObjectsResponse {
-  // Information about processing the request, including any error information
-  google.rpc.Status status = 1;
-  // A mapping between objects' unique sandbar-generated IDs and a list of attachments associated with them
-  map<string, AttachmentObjectLinkList> attachments_by_subject_sandbar_id = 2;
 }
 
 // Information about an attachment uploaded to Sandbar
@@ -1267,38 +595,12 @@ message AttachmentObjectLinkList {
   repeated AttachmentObjectLink attachment_object_links = 2;
 }
 
-// A request to add a report based on manual risk analysis
-// At least one identifier for the reporter is required.
-message AddManualReportRequest {
- // The sandbar-generated unique ID of the report's investigation target, which must be an entity
- string target_sandbar_id = 1;
- // A narrative about the nature of the risk and how it was identified
- optional string narrative = 2;
- // A categorization of the level of risk posed
- ManualReportRiskLevel risk_level = 3;
- // The name of the person who reported the risk
- optional string reporter_name = 4;
- // Your institution's identifier for the person who reported the risk
- optional string reporter_id = 5;
- // The person who reported the risk's email address
- optional string reporter_email_address = 6;
-}
-
 // Categorizations for the level of risk for a manual report
 enum ManualReportRiskLevel {
   MANUAL_REPORT_RISK_LEVEL_UNSPECIFIED = 0;
   MANUAL_REPORT_RISK_LEVEL_LOW = 1;
   MANUAL_REPORT_RISK_LEVEL_MEDIUM = 2;
   MANUAL_REPORT_RISK_LEVEL_HIGH = 3;
-}
-
-// A response containing the result of adding a rule output
-message AddManualReportResponse {
-  // The created manual report
-  ManualReport manual_report = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states
-  string message = 2;
 }
 
 // Information about manually uploaded risk information
@@ -1319,51 +621,6 @@ message ManualReport {
   string timestamp = 7;
   // The sandbar-generated unique ID of the alert this manual report triggered
   string sandbar_alert_id = 8;
-}
-
-// A request to highlight an object as significant to an investigation or alert
-message HighlightObjectForInvestigationOrAlertRequest {
-  // The sandbar-generated unique ID of the object to highlight. The object must be an entity, account, or transaction.
-  string object_sandbar_id = 1;
-  // The sandbar-generated unique ID of the investigation or alert
-  string investigation_alert_sandbar_id = 2;
-}
-
-// A response confirming an object was highlighted for an investigation
-message HighlightObjectForInvestigationOrAlertResponse {
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states
-  string message = 1;
-}
-
-// A request to remove a highlighted object from an investigation or alert
-message RemoveHighlightedObjectRequest {
-  // The sandbar-generated unique ID of the object
-  string object_sandbar_id = 1;
-  // The sandbar-generated unique ID of the investigation or alert
-  string investigation_alert_sandbar_id = 2;
-}
-
-// A response confirming an object is no longer highlighted for an investigation or alert
-message RemoveHighlightedObjectResponse {
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states
-  string message = 1;
-}
-
-// A request to get all objects highlighted for an investigation or alert
-message GetHighlightedObjectsRequest {
-  // The sandbar-generated unique ID for the investigation or alert
-  string investigation_alert_sandbar_id = 1;
-}
-
-// A response containing the objects highlighted for an investigation or alert
-message GetHighlightedObjectsResponse {
-  // The sandbar-generated unique ID of the highlighted objects
-  repeated string object_sandbar_ids = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states
-  string message = 2;
 }
 
 // The various possible results of a request to close an alert or investigation.
