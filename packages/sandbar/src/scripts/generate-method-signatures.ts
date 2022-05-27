@@ -46,7 +46,7 @@ function getHttpPathForMethod(method: string) {
   }
   if (rule.body != "*") {
     throw new Error(
-      "HTTP bindings with any body option other than '*' are not supported"
+      "HTTP bindings with any body option other than '*' are not supported" + method
     )
   }
   if (rule.pattern.oneofKind !== "post") {

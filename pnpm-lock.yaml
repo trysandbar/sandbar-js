@@ -49,6 +49,19 @@ importers:
     devDependencies:
       '@types/humanize-duration': 3.27.1
 
+  examples/unit-example:
+    specifiers:
+      '@types/humanize-duration': ^3.27.1
+      commander: ^9.0.0
+      humanize-duration: ^3.27.1
+      sandbar: workspace:^0.1.0-alpha.10
+    dependencies:
+      commander: 9.0.0
+      humanize-duration: 3.27.1
+      sandbar: link:../../packages/sandbar
+    devDependencies:
+      '@types/humanize-duration': 3.27.1
+
   packages/sandbar:
     specifiers:
       '@jest/types': ^28.1.0
