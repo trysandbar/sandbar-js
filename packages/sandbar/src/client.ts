@@ -28,20 +28,20 @@ type EventPayloadReplacingEntityType<TEntity extends publicapi.Entity> =
 type Event = Omit<publicapi.Event, "payload" | "incomplete" | "type"> &
   (
     | {
-      payload: EventPayloadReplacingEntityType<CompleteEntityCreate>
-      incomplete: false
-      type: publicapi.EventType.CREATE
-    }
+        payload: EventPayloadReplacingEntityType<CompleteEntityCreate>
+        incomplete: false
+        type: publicapi.EventType.CREATE
+      }
     | {
-      payload: EventPayloadReplacingEntityType<CompleteEntity>
-      incomplete: false
-      type: Exclude<publicapi.EventType, publicapi.EventType.CREATE>
-    }
+        payload: EventPayloadReplacingEntityType<CompleteEntity>
+        incomplete: false
+        type: Exclude<publicapi.EventType, publicapi.EventType.CREATE>
+      }
     | {
-      payload: EventPayloadReplacingEntityType<publicapi.Entity>
-      incomplete: true
-      type: publicapi.EventType
-    }
+        payload: EventPayloadReplacingEntityType<publicapi.Entity>
+        incomplete: true
+        type: publicapi.EventType
+      }
   )
 
 /**
@@ -67,11 +67,11 @@ type Method<I extends object, O extends object> = {
 
 type HostSpecifier =
   | {
-    subdomain: string
-  }
+      subdomain: string
+    }
   | {
-    url: string
-  }
+      url: string
+    }
 
 type Auth = {
   username: string
@@ -151,48 +151,72 @@ export class Client {
   }
 
   async createUnitCustomer(
-    customer: publicapi.UnitCustomer): Promise<publicapi.CreateUnitCustomerResponse> {
-    const { request: grpcEvent, ...remainder } = await this.callMethod(methods.CreateUnitCustomer, {
-      customer,
-    });
-    const request = translateEvent(grpcEvent);
-    return { request, ...remainder };
+    customer: publicapi.UnitCustomer
+  ): Promise<publicapi.CreateUnitCustomerResponse> {
+    const { request: grpcEvent, ...remainder } = await this.callMethod(
+      methods.CreateUnitCustomer,
+      {
+        customer,
+      }
+    )
+    const request = translateEvent(grpcEvent)
+    return { request, ...remainder }
   }
 
   async createUnitDepositAccount(
-    depositAccount: publicapi.UnitDepositAccount): Promise<publicapi.CreateUnitDepositAccountResponse> {
-    const { status, accountResponse: grpcAccountResponse, accountEntityLinkResponse: grpcAccountEntityLinkResponse } = await this.callMethod(methods.CreateUnitDepositAccount, {
-      depositAccount
-    });
+    depositAccount: publicapi.UnitDepositAccount
+  ): Promise<publicapi.CreateUnitDepositAccountResponse> {
+    const {
+      status,
+      accountResponse: grpcAccountResponse,
+      accountEntityLinkResponse: grpcAccountEntityLinkResponse,
+    } = await this.callMethod(methods.CreateUnitDepositAccount, {
+      depositAccount,
+    })
     if (!grpcAccountResponse) {
-      throw new TypeError("Missing account response");
-    } 
+      throw new TypeError("Missing account response")
+    }
     if (!grpcAccountEntityLinkResponse) {
-      throw new TypeError("Missing account entity link response");
-    } 
-    const {request: grpcAccountRequest, ...accountRest} = grpcAccountResponse;
-    const {request: grpcAccountEntityLinkRequest, ...accountEntityLinkRest} = grpcAccountEntityLinkResponse;
-    const accountResponse = {request: translateEvent(grpcAccountRequest), ...accountRest};
-    const accountEntityLinkResponse = {request: translateEvent(grpcAccountEntityLinkRequest), ...accountEntityLinkRest};
-    return { status, accountResponse, accountEntityLinkResponse };
+      throw new TypeError("Missing account entity link response")
+    }
+    const { request: grpcAccountRequest, ...accountRest } = grpcAccountResponse
+    const { request: grpcAccountEntityLinkRequest, ...accountEntityLinkRest } =
+      grpcAccountEntityLinkResponse
+    const accountResponse = {
+      request: translateEvent(grpcAccountRequest),
+      ...accountRest,
+    }
+    const accountEntityLinkResponse = {
+      request: translateEvent(grpcAccountEntityLinkRequest),
+      ...accountEntityLinkRest,
+    }
+    return { status, accountResponse, accountEntityLinkResponse }
   }
 
   async createUnitPayment(
-    payment: publicapi.UnitPayment): Promise<publicapi.CreateUnitPaymentResponse> {
-    const { request: grpcEvent, ...remainder } = await this.callMethod(methods.CreateUnitPayment, {
-      payment
-    });
-    const request = translateEvent(grpcEvent);
-    return { request, ...remainder };
+    payment: publicapi.UnitPayment
+  ): Promise<publicapi.CreateUnitPaymentResponse> {
+    const { request: grpcEvent, ...remainder } = await this.callMethod(
+      methods.CreateUnitPayment,
+      {
+        payment,
+      }
+    )
+    const request = translateEvent(grpcEvent)
+    return { request, ...remainder }
   }
 
   async updateUnitPayment(
-    payment: publicapi.UnitPayment): Promise<publicapi.UpdateUnitPaymentResponse> {
-    const { request: grpcEvent, ...remainder } = await this.callMethod(methods.UpdateUnitPayment, {
-      payment
-    });
-    const request = translateEvent(grpcEvent);
-    return { request, ...remainder };
+    payment: publicapi.UnitPayment
+  ): Promise<publicapi.UpdateUnitPaymentResponse> {
+    const { request: grpcEvent, ...remainder } = await this.callMethod(
+      methods.UpdateUnitPayment,
+      {
+        payment,
+      }
+    )
+    const request = translateEvent(grpcEvent)
+    return { request, ...remainder }
   }
 
   private async callMethod<I extends object, O extends object>(
