@@ -44,6 +44,14 @@ type Event = Omit<publicapi.Event, "payload" | "incomplete" | "type"> &
       }
   )
 
+type CreateUnitDepositAccountResponse = Omit<
+  publicapi.CreateUnitDepositAccountResponse,
+  "accountResponse" | "accountEntityLinkResponse"
+> & {
+  accountResponse: EventResponse
+  accountEntityLinkResponse: EventResponse
+}
+
 /**
  * Response from a call to submit events endpoint.
  *
@@ -145,8 +153,71 @@ export class Client {
     const request = translateEvent(grpcEvent)
     return {
       ruleOutputs,
+      request,
       ...remainder,
     }
+  }
+
+  async createUnitCustomer(
+    customer: publicapi.UnitCustomer
+  ): Promise<publicapi.CreateUnitCustomerResponse> {
+    const { request: grpcEvent, ...remainder } = await this.callMethod(
+      methods.CreateUnitCustomer,
+      {
+        customer,
+      }
+    )
+    const request = translateEvent(grpcEvent)
+    return { request, ...remainder }
+  }
+
+  async createUnitDepositAccount(
+    depositAccount: publicapi.UnitDepositAccount
+  ): Promise<CreateUnitDepositAccountResponse> {
+    const {
+      status,
+      accountResponse: grpcAccountResponse,
+      accountEntityLinkResponse: grpcAccountEntityLinkResponse,
+    } = await this.callMethod(methods.CreateUnitDepositAccount, {
+      depositAccount,
+    })
+    if (!grpcAccountResponse) {
+      throw new TypeError("Missing account response")
+    }
+    if (!grpcAccountEntityLinkResponse) {
+      throw new TypeError("Missing account entity link response")
+    }
+    const accountResponse = translateEventResponse(grpcAccountResponse)
+    const accountEntityLinkResponse = translateEventResponse(
+      grpcAccountEntityLinkResponse
+    )
+    return { status, accountResponse, accountEntityLinkResponse }
+  }
+
+  async createUnitPayment(
+    payment: publicapi.UnitPayment
+  ): Promise<publicapi.CreateUnitPaymentResponse> {
+    const { request: grpcEvent, ...remainder } = await this.callMethod(
+      methods.CreateUnitPayment,
+      {
+        payment,
+      }
+    )
+    const request = translateEvent(grpcEvent)
+    return { request, ...remainder }
+  }
+
+  async updateUnitPayment(
+    payment: publicapi.UnitPayment
+  ): Promise<publicapi.UpdateUnitPaymentResponse> {
+    const { request: grpcEvent, ...remainder } = await this.callMethod(
+      methods.UpdateUnitPayment,
+      {
+        payment,
+      }
+    )
+    const request = translateEvent(grpcEvent)
+    return { request, ...remainder }
   }
 
   private async callMethod<I extends object, O extends object>(

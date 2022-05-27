@@ -1,0 +1,21 @@
+{
+  "name": "unit-example",
+  "private": true,
+  "version": "0.1.0-alpha.10",
+  "description": "Example usage of the Unit-compatible functionality in the sandbar client library",
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "fmt": "prettier",
+    "build": "tsc --build tsconfig.build.json",
+    "clean": "tsc --build tsconfig.build.json --clean",
+    "dev": "./src/index.ts"
+  },
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^9.0.0",
+    "sandbar": "^0.1.0-alpha.10"
+  }
+}
