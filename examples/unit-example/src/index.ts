@@ -1,7 +1,6 @@
 #!/usr/bin/env ts-node-script
 
 import * as sandbar from "sandbar"
-import humanizeDuration from "humanize-duration"
 import { program } from "commander"
 
 class Example {
@@ -214,6 +213,7 @@ class Example {
     )
   }
 }
+
 async function main() {
   program.option(
     "--url <url>",

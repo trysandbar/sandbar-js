@@ -16,10 +16,6 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^9.0.0",
-    "humanize-duration": "^3.27.1",
-    "sandbar": "workspace:^0.1.0-alpha.10"
-  },
-  "devDependencies": {
-    "@types/humanize-duration": "^3.27.1"
+    "sandbar": "^0.1.0-alpha.10"
   }
 }
