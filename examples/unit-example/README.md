@@ -1,8 +1,9 @@
 # example-ts
 
-Note: This is an alpha feature. 
+Note: This is an alpha feature.
 
-Example of how to upload Unit (https://www.unit.co/) objects to Sandbar using the SDK. 
+Example of how to upload Unit (https://www.unit.co/) objects to Sandbar using
+the SDK.
 
 ## Executing
 
