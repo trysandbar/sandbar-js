@@ -208,12 +208,12 @@ export class Client {
   }
 
   async updateUnitDepositAccount(
-    customer: publicapi.UnitDepositAccount
+    depositAccount: publicapi.UnitDepositAccount
   ): Promise<publicapi.UpdateUnitDepositAccountResponse> {
     const { request: grpcEvent, ...remainder } = await this.callMethod(
       methods.UpdateUnitDepositAccount,
       {
-        customer,
+        depositAccount,
       }
     )
     const request = translateEvent(grpcEvent)
