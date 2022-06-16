@@ -9,7 +9,7 @@ first copy the file to packages/sandbar/proto/sandbar.proto in this repo. Next,
 run the following command to generate the necessary TypeScript code:
 
 ```sh
-pnpm run gen-proto && pnpm run gen-method-sigs && pnpm run transform-proto
+pnpm --filter sandbar codegen
 ```
 
 ## Building the dist Bundle
