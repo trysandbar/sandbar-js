@@ -285,10 +285,28 @@ service SandbarApiService {
   }
 
   // EXPERIMENTAL FEATURE
+  // Updates a previously uploaded Unit customer
+  rpc UpdateUnitCustomer(UpdateUnitCustomerRequest) returns (UpdateUnitCustomerResponse) {
+    option (google.api.http) = {
+      post: "/v0/unit/updateCustomer"
+      body: "*"
+    };
+  }
+
+  // EXPERIMENTAL FEATURE
   // Uploads a Unit deposit account for Sandbar to ingest as an account
   rpc CreateUnitDepositAccount(CreateUnitDepositAccountRequest) returns (CreateUnitDepositAccountResponse) {
     option (google.api.http) = {
       post: "/v0/unit/createDepositAccount"
+      body: "*"
+    };
+  }
+
+  // EXPERIMENTAL FEATURE
+  // Updates a previously uploaded Unit deposit account
+  rpc UpdateUnitDepositAccount(UpdateUnitDepositAccountRequest) returns (UpdateUnitDepositAccountResponse) {
+    option (google.api.http) = {
+      post: "/v0/unit/updateDepositAccount"
       body: "*"
     };
   }
@@ -307,6 +325,15 @@ service SandbarApiService {
   rpc UpdateUnitPayment(UpdateUnitPaymentRequest) returns (UpdateUnitPaymentResponse) {
     option (google.api.http) = {
       post: "/v0/unit/updatePayment"
+      body: "*"
+    };
+  }
+
+  // EXPERIMENTAL FEATURE
+  // Allows uploading a Unit transaction
+  rpc CreateUnitTransaction(CreateUnitTransactionRequest) returns (CreateUnitTransactionResponse) {
+    option (google.api.http) = {
+      post: "/v0/unit/createTransaction"
       body: "*"
     };
   }
@@ -1416,12 +1443,20 @@ message GetHighlightedObjectsResponse {
   string message = 2;
 }
 
+// EXPERIMENTAL
 // Contains a Unit business or individual customer
-// See https://docs.unit.co/customers
 message CreateUnitCustomerRequest {
   UnitCustomer customer = 1;
 }
 
+// EXPERIMENTAL FEATURE
+// Contains an updated Unit business or individual customer
+message UpdateUnitCustomerRequest {
+  UnitCustomer customer = 1;
+}
+
+// EXPERIMENTAL
+// See https://docs.unit.co/customers
 message UnitCustomer {
   string id = 1;
   string type = 2;
@@ -1442,8 +1477,9 @@ message UnitCustomerAttributes {
   optional string dba = 11;
   optional string state_of_incorporation = 12;
   optional string ein = 13;
-  optional string entityType = 14;
+  optional string entity_type = 14;
   optional UnitBusinessContact contact = 15;
+  repeated UnitAuthorizedUser authorized_users = 16;
 }
 
 message UnitFullName {
@@ -1471,6 +1507,17 @@ message UnitBusinessContact {
   UnitPhone phone = 3;
 }
 
+// EXPERIMENTAL
+// See https://docs.unit.co/customers/#authorized-users
+message UnitAuthorizedUser {
+  UnitFullName full_name = 1;
+  string email = 2;
+  UnitPhone phone = 3;
+  optional string jwt_subject = 4;
+}
+
+// EXPERIMENTAL
+// Information about the Sandbar entity created to represent the Unit customer submitted
 message CreateUnitCustomerResponse {
   // Information about processing the request, including any error information
   google.rpc.Status status = 1;
@@ -1486,12 +1533,37 @@ message CreateUnitCustomerResponse {
   Event request = 6;
 }
 
+// EXPERIMENTAL FEATURE
+// Information about the Sandbar entity reflecting updates to the provided Unit customer
+message UpdateUnitCustomerResponse {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
+  // The sandbar ID of the item created/changed/deleted by the event.
+  string sandbar_id = 2;
+  // The source ID of the item created/changed/deleted by the event that the time the event was sent.
+  string source_id = 3;
+  // In the event that there is an incomplete item, this is the sandbar-generated ID for the object.
+  string generated_id = 4;
+  // Specifies the type of payload that this message is in response to
+  EventResponseType event_response_type = 5;
+  // The Unit customer as a Sandbar entity event.
+  Event request = 6;
+}
+
+// EXPERIMENTAL
 // Contains a Unit deposit account
-// See https://docs.unit.co/resources#depositaccount
 message CreateUnitDepositAccountRequest {
   UnitDepositAccount deposit_account = 1;
 }
 
+// EXPERIMENTAL FEATURE
+// Contains updates to a Unit deposit account
+message UpdateUnitDepositAccountRequest {
+  UnitDepositAccount deposit_account = 1;
+}
+
+// EXPERIMENTAL
+// Information about the Sandbar account created to represent the Unit deposit account
 message CreateUnitDepositAccountResponse {
   // Information about processing the request, including any error information
   google.rpc.Status status = 1;
@@ -1502,6 +1574,25 @@ message CreateUnitDepositAccountResponse {
   EventResponse account_entity_link_response = 3;
 }
 
+// EXPERIMENTAL FEATURE
+// Information about the Sandbar account reflecting updates to the provided Unit deposit account
+message UpdateUnitDepositAccountResponse {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
+  // The sandbar ID of the item created/changed/deleted by the event.
+  string sandbar_id = 2;
+  // The source ID of the item created/changed/deleted by the event that the time the event was sent.
+  string source_id = 3;
+  // In the event that there is an incomplete item, this is the sandbar-generated ID for the object.
+  string generated_id = 4;
+  // Specifies the type of payload that this message is in response to
+  EventResponseType event_response_type = 5;
+  // The Unit customer as a Sandbar entity event.
+  Event request = 6;
+}
+
+// EXPERIMENTAL
+// See https://docs.unit.co/resources#depositaccount
 message UnitDepositAccount {
   string id = 1;
   string type = 2;
@@ -1527,16 +1618,21 @@ message UnitDepositAccountAttributes {
   optional string daca_status = 15;
 }
 
-// Contains a Unit payment
-// See https://docs.unit.co/payments#get-specific-payment
+// EXPERIMENTAL
+// A request to create a Sandbar transaction representing a Unit payment
 message CreateUnitPaymentRequest {
   UnitPayment payment = 1;
 }
 
+// EXPERIMENTAL
+// A request to update a Sandbar transaction representing a Unit payment,
+// typically to update the status
 message UpdateUnitPaymentRequest {
   UnitPayment payment = 1;
 }
 
+// EXPERIMENTAL
+// Information about the Sandbar transaction representing the Unit payment
 message CreateUnitPaymentResponse {
   // Information about processing the request, including any error information
   google.rpc.Status status = 1;
@@ -1550,6 +1646,8 @@ message CreateUnitPaymentResponse {
   Event request = 6;
 }
 
+// EXPERIMENTAL
+// Information about the updates to the Sandbar transaction representing the Unit payment
 message UpdateUnitPaymentResponse {
   // Information about processing the request, including any error information
   google.rpc.Status status = 1;
@@ -1563,6 +1661,8 @@ message UpdateUnitPaymentResponse {
   Event request = 6;
 }
 
+// EXPERIMENTAL
+// See https://docs.unit.co/payments
 message UnitPayment {
   string type = 1;
   string id = 2;
@@ -1584,6 +1684,7 @@ message UnitPaymentAttributes {
   optional UnitImadOmad imad_omad = 11;
 }
 
+// Could be a Wire Counterparty or Counterparty
 message UnitCounterparty {
   string routing_number = 1;
   string account_number = 2;
@@ -1597,17 +1698,115 @@ message UnitImadOmad {
   string omad = 2;
 }
 
+// EXPERIMENTAL FEATURE
+// A request to upload a Unit transaction to Sandbar
+message CreateUnitTransactionRequest {
+  UnitTransaction transaction = 1;
+}
+
+// EXPERIMENTAL FEATURE
+// A response containing information about the
+// Sandbar transaction created to represent the Unit one
+message CreateUnitTransactionResponse {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
+  // The sandbar ID of the item created/changed/deleted by the event.
+  string sandbar_id = 2;
+  // The source ID of the item created/changed/deleted by the event that the time the event was sent.
+  string source_id = 3;
+  // In the event that there is an incomplete item, this is the sandbar-generated ID for the object.
+  string generated_id = 4;
+  // Specifies the type of payload that this message is in response to
+  EventResponseType event_response_type = 5;
+  // The Unit customer as a Sandbar entity event.
+  Event request = 6;
+}
+
+// EXPERIMENTAL FEATURE
+// See https://docs.unit.co/transactions
+message UnitTransaction {
+  string id = 1;
+  string type =  2;
+  UnitTransactionAttributes attributes = 3;
+  UnitRelationships relationships = 4;
+}
+
+// EXPERIMENTAL FEATURE
+message UnitTransactionAttributes {
+  string created_at = 1;
+  string direction = 2;
+  int32 amount = 3;
+  int32 balance = 4;
+  string summary = 5;
+  optional string description = 7;
+  optional string addenda = 8;
+  optional UnitCounterparty counterparty = 9;
+  optional string company_name = 10;
+  optional string counterparty_routing_number = 11;
+  optional string trace_number = 12;
+  optional string sec_code = 13;
+  optional string counterparty_name = 14;
+  optional string reason = 15;
+  optional string originator_to_beneficiary_information = 16;
+  optional string sender_reference = 17;
+  optional string reference_for_beneficiary = 18;
+  optional string beneficiary_information = 19;
+  optional string beneficiary_advice_information = 20;
+  optional string card_last4_digits = 21;
+  optional UnitMerchant merchant = 22;
+  optional UnitCoordinates coordinates = 23;
+  optional bool recurring = 24;
+  optional double interchange = 25;
+  optional bool ecommerce = 26;
+  optional bool card_present = 27;
+  optional string payment_method = 28;
+  optional string digital_wallet = 29;
+  optional UnitCardVerificationData card_verification_data = 30;
+  optional string card_network = 31;
+  optional string atm_name = 32;
+  optional string atm_location = 33;
+  optional double surcharge = 34;
+  optional string sender_name = 35;
+  optional string sender_address = 36;
+  optional string sender_account_number = 37;
+  optional string dispute_id = 38;
+  optional UnitCounterparty receiver_counterparty = 39;
+}
+
+// EXPERIMENTAL FEATURE
+message UnitMerchant {
+  string name = 1;
+  int32 type = 2;
+  string category = 3;
+  string location = 4;
+}
+
+// EXPERIMENTAL FEATURE
+message UnitCoordinates {
+  double longitude = 1;
+  double latitude = 2;
+}
+
+// EXPERIMENTAL FEATURE
+message UnitCardVerificationData {
+  string verification_method = 1;
+}
+
+// EXPERIMENTAL FEATURE
 message UnitRelationships {
   optional UnitRelatedCustomer customer = 1;
   optional UnitRelatedDepositAccount account = 2;
   optional UnitRelatedPayment payment = 3;
   optional UnitRelatedCounterparty counterparty = 4;
+  optional UnitRelatedTransaction transaction = 5;
 }
 
+// EXPERIMENTAL FEATURE
 message UnitRelatedCustomer {
   UnitRelatedCustomerData data = 1;
 }
 
+// EXPERIMENTAL FEATURE
 message UnitRelatedCustomerData {
   string type = 1;
   string id = 2;

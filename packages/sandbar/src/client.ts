@@ -171,6 +171,19 @@ export class Client {
     return { request, ...remainder }
   }
 
+  async updateUnitCustomer(
+    customer: publicapi.UnitCustomer
+  ): Promise<publicapi.UpdateUnitCustomerResponse> {
+    const { request: grpcEvent, ...remainder } = await this.callMethod(
+      methods.UpdateUnitCustomer,
+      {
+        customer,
+      }
+    )
+    const request = translateEvent(grpcEvent)
+    return { request, ...remainder }
+  }
+
   async createUnitDepositAccount(
     depositAccount: publicapi.UnitDepositAccount
   ): Promise<CreateUnitDepositAccountResponse> {
@@ -194,6 +207,19 @@ export class Client {
     return { status, accountResponse, accountEntityLinkResponse }
   }
 
+  async updateUnitDepositAccount(
+    customer: publicapi.UnitDepositAccount
+  ): Promise<publicapi.UpdateUnitDepositAccountResponse> {
+    const { request: grpcEvent, ...remainder } = await this.callMethod(
+      methods.UpdateUnitDepositAccount,
+      {
+        customer,
+      }
+    )
+    const request = translateEvent(grpcEvent)
+    return { request, ...remainder }
+  }
+
   async createUnitPayment(
     payment: publicapi.UnitPayment
   ): Promise<publicapi.CreateUnitPaymentResponse> {
@@ -214,6 +240,19 @@ export class Client {
       methods.UpdateUnitPayment,
       {
         payment,
+      }
+    )
+    const request = translateEvent(grpcEvent)
+    return { request, ...remainder }
+  }
+
+  async createUnitTransaction(
+    transaction: publicapi.UnitTransaction
+  ): Promise<publicapi.CreateUnitTransactionResponse> {
+    const { request: grpcEvent, ...remainder } = await this.callMethod(
+      methods.CreateUnitTransaction,
+      {
+        transaction,
       }
     )
     const request = translateEvent(grpcEvent)
