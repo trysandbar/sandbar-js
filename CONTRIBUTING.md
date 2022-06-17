@@ -2,6 +2,16 @@
 
 This document is meant for maintainers.
 
+## Updating Proto Definitions
+
+If you need to update this repo's sandbar.proto file to match the main repo,
+first copy the file to packages/sandbar/proto/sandbar.proto in this repo. Next,
+run the following command to generate the necessary TypeScript code:
+
+```sh
+pnpm --filter sandbar codegen
+```
+
 ## Building the dist Bundle
 
 ```sh
