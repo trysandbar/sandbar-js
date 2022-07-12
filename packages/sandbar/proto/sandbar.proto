@@ -497,11 +497,20 @@ message GetEntityRequest {
 
 // A response containing requested entity information.
 message GetEntityResponse {
-  // Contents the entities requested.
-  repeated Entity entity = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
+  // The entities requested, indexed by ID
+  repeated RetrievedEntity entities = 2;
+}
+
+// The result of an attempt to get an entity by ID
+message RetrievedEntity {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
+  // The entity ID submitted
+  EntityQueryIdParam request = 2;
+  // The entity requested
+  Entity entity = 3;
 }
 
 /* @exclude ACCOUNT SECTION */
@@ -509,9 +518,14 @@ message GetEntityResponse {
 // Information sufficient to identify a given account.
 message AccountIdentifier {
   // An account number that is at any given point in time globally unique within a given institution.
-  string account_number = 1;
+  // At least one of account_number or source_id must be provided.
+  optional string account_number = 1;
   // An institution that the given account belongs to.
   string bank_name = 2;
+  // Your system's unique identifier for the account, which can be different from the account number. This value
+  // should be globally unique across a given institution across time.
+  // At least one of account_number or source_id must be provided.
+  optional string source_id = 3;
 }
 
 // Object containing info about an account.
@@ -681,6 +695,8 @@ message Transaction {
   optional int32 transaction_source_routing_number = 34;
   // The routing number associated with a counterparty in a  given transaction.
   optional int32 counterparty_routing_number = 35;
+  // The sandbar-generated unique ID of the counterparty entity
+  optional string counterparty_sandbar_id = 36;
 }
 
 // A wrapper for an identifier for a given transaction.
@@ -1799,6 +1815,8 @@ message UnitRelationships {
   optional UnitRelatedPayment payment = 3;
   optional UnitRelatedCounterparty counterparty = 4;
   optional UnitRelatedTransaction transaction = 5;
+  optional UnitRelatedCounterpartyCustomer counterparty_customer = 6;
+  optional UnitRelatedCounterpartyAccount counterparty_account = 7;
 }
 
 // EXPERIMENTAL FEATURE
@@ -1812,38 +1830,72 @@ message UnitRelatedCustomerData {
   string id = 2;
 }
 
+// EXPERIMENTAL FEATURE
 message UnitRelatedDepositAccount {
   UnitRelatedDepositAccountData data = 1;
 }
 
+// EXPERIMENTAL FEATURE
 message UnitRelatedDepositAccountData {
   string type = 1;
   string id = 2;
 }
 
+// EXPERIMENTAL FEATURE
 message UnitRelatedPayment {
   UnitRelatedPaymentData data = 1;
 }
 
+// EXPERIMENTAL FEATURE
 message UnitRelatedPaymentData {
   string type = 1;
   string id = 2;
 }
 
+// EXPERIMENTAL FEATURE
 message UnitRelatedCounterparty {
   UnitRelatedCounterpartyData data = 1;
 }
 
+// EXPERIMENTAL FEATURE
 message UnitRelatedCounterpartyData {
   string type = 1;
   string id = 2;
 }
 
+// EXPERIMENTAL FEATURE
 message UnitRelatedTransaction {
   UnitRelatedTransactionData data = 1;
 }
 
+// EXPERIMENTAL FEATURE
 message UnitRelatedTransactionData {
+  string type = 1;
+  string id = 2;
+}
+
+// EXPERIMENTAL FEATURE
+// Information about a transaction's counterparty account
+message UnitRelatedCounterpartyAccount {
+  UnitRelatedCounterpartyAccountData data = 1;
+}
+
+// EXPERIMENTAL FEATURE
+// Information about a transaction's counterparty account
+message UnitRelatedCounterpartyAccountData {
+  string type = 1;
+  string id = 2;
+}
+
+// EXPERIMENTAL FEATURE
+// Information about a transaction's counterparty customer
+message UnitRelatedCounterpartyCustomer {
+  UnitRelatedCounterpartyCustomerData data = 1;
+}
+
+// EXPERIMENTAL FEATURE
+// Information about a transaction's counterparty customer
+message UnitRelatedCounterpartyCustomerData {
   string type = 1;
   string id = 2;
 }
