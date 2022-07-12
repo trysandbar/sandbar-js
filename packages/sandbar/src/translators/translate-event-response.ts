@@ -59,7 +59,7 @@ export function translateEventResponse(
         sourceAccountId: {
           bankName,
           accountNumber,
-          sourceId: accountSourceId
+          sourceId: accountSourceId,
         },
         sandbarId,
         status,
