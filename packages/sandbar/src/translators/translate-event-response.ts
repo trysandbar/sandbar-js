@@ -53,12 +53,13 @@ export function translateEventResponse(
         status,
       }
     case publicapi.EventResponseType.ACCOUNT: {
-      const [bankName, accountNumber] = sourceId.split("|", 2)
+      const [bankName, accountNumber, accountSourceId] = sourceId.split("|", 2)
       return {
         responseType: "account",
         sourceAccountId: {
           bankName,
           accountNumber,
+          sourceId: accountSourceId
         },
         sandbarId,
         status,
