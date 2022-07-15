@@ -227,6 +227,7 @@ class Example {
     const updatePaymentResponse = await this.client.updateUnitPayment(
       sentAchPaymentRequest
     )
+
     console.log(
       `update ach payment response: ${JSON.stringify(
         updatePaymentResponse,
@@ -234,6 +235,78 @@ class Example {
         2
       )}`
     )
+
+    const createCheckDepositRequest =   {
+      "type": "checkDeposit",
+      "id": "11221",
+      "attributes": {
+        "createdAt": "2021-05-27T09:29:30.828Z",
+        "amount": 20000,
+        "description": "Check deposit",
+        "status": "AwaitingImages"
+      },
+      "relationships": {
+        "account": {
+          "data": {
+            "type": "account",
+            "id": "1"
+          }
+        },
+        "customer": {
+          "data": {
+            "type": "customer",
+            "id": "8"
+          }
+        }
+      }
+    }
+    
+      const createCheckDepositResponse = await this.client.createUnitCheckDeposit(
+        createCheckDepositRequest);
+
+        console.log(
+          `create check deposit response: ${JSON.stringify(
+            createCheckDepositResponse,
+            undefined,
+            2
+          )}`
+        )
+
+        const updateCheckDepositRequest = {
+          "type": "checkDeposit",
+          "id": "11221",
+          "attributes": {
+            "createdAt": "2021-05-27T09:29:30.828Z",
+            "amount": 20000,
+            "description": "Check deposit",
+            "status": "Sent"
+          },
+          "relationships": {
+            "account": {
+              "data": {
+                "type": "account",
+                "id": "1"
+              }
+            },
+            "customer": {
+              "data": {
+                "type": "customer",
+                "id": "8"
+              }
+            }
+          }
+        }
+
+        const updateCheckDepositResponse = await this.client.updateUnitCheckDeposit(
+          updateCheckDepositRequest);
+  dsds
+          console.log(
+            `update check deposit response: ${JSON.stringify(
+              createCheckDepositResponse,
+              undefined,
+              2
+            )}`
+          )
   }
 }
 
