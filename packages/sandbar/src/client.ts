@@ -195,10 +195,12 @@ export class Client {
       depositAccount,
     })
     if (!grpcAccountResponse) {
-      throw new TypeError("Missing account response")
+      throw new TypeError("Missing account response, status " + status)
     }
     if (!grpcAccountEntityLinkResponse) {
-      throw new TypeError("Missing account entity link response")
+      throw new TypeError(
+        "Missing account entity link response, status " + status
+      )
     }
     const accountResponse = translateEventResponse(grpcAccountResponse)
     const accountEntityLinkResponse = translateEventResponse(
@@ -253,6 +255,32 @@ export class Client {
       methods.CreateUnitTransaction,
       {
         transaction,
+      }
+    )
+    const request = translateEvent(grpcEvent)
+    return { request, ...remainder }
+  }
+
+  async createUnitCheckDeposit(
+    checkDeposit: publicapi.UnitCheckDeposit
+  ): Promise<publicapi.CreateUnitCheckDepositResponse> {
+    const { request: grpcEvent, ...remainder } = await this.callMethod(
+      methods.CreateUnitCheckDeposit,
+      {
+        checkDeposit,
+      }
+    )
+    const request = translateEvent(grpcEvent)
+    return { request, ...remainder }
+  }
+
+  async updateUnitCheckDeposit(
+    checkDeposit: publicapi.UnitCheckDeposit
+  ): Promise<publicapi.UpdateUnitCheckDepositResponse> {
+    const { request: grpcEvent, ...remainder } = await this.callMethod(
+      methods.UpdateUnitCheckDeposit,
+      {
+        checkDeposit,
       }
     )
     const request = translateEvent(grpcEvent)

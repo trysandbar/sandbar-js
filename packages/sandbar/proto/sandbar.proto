@@ -337,7 +337,26 @@ service SandbarApiService {
       body: "*"
     };
   }
-}
+
+  // EXPERIMENTAL FEATURE
+  // Allows uploading a Unit check deposit
+  rpc CreateUnitCheckDeposit(CreateUnitCheckDepositRequest) returns (CreateUnitCheckDepositResponse) {
+    option (google.api.http) = {
+      post: "/v0/unit/createCheckDeposit"
+      body: "*"
+    };
+  }
+
+  // EXPERIMENTAL FEATURE
+  // Allows updating a previously uploaded Unit check deposit
+  rpc UpdateUnitCheckDeposit(UpdateUnitCheckDepositRequest) returns (UpdateUnitCheckDepositResponse) {
+    option (google.api.http) = {
+      post: "/v0/unit/updateCheckDeposit"
+      body: "*"
+    };
+  }
+
+  }
 
 // Message containing a detailed error response
 message ErrorDetails {
@@ -562,13 +581,21 @@ message GetAccountRequest {
   reserved "knowledge_date", "effective_date";
 }
 
-// Response containing requested account related information and a message.
+// Response containing requested account related information
 message GetAccountResponse {
-  // Set of accounts
-  repeated Account accounts = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
+  // The result of the attempt to retrieve each account
+  repeated RetrievedAccount accounts = 1;
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 3;
+  reserved 2;
+  reserved "message";
+}
+
+message RetrievedAccount {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
+  // The account retrieved
+  Account account = 2;
 }
 
 // A transaction may go through many different states in its lifetime. This represents the different
@@ -616,9 +643,10 @@ message GetAccountsForEntityRequest {
 message GetAccountsForEntityResponse {
   // Set of accounts
   repeated Account accounts = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 3;
+  reserved "2";
+  reserved "message";
 }
 
 /* TRANSACTION */
@@ -697,6 +725,12 @@ message Transaction {
   optional int32 counterparty_routing_number = 35;
   // The sandbar-generated unique ID of the counterparty entity
   optional string counterparty_sandbar_id = 36;
+  // The unique internal client ID identifying a transaction related to this one.
+  // For example, if this transaction represents a reversal, the related transaction
+  // is the transaction reversed by this one.
+  optional string related_transaction_source_id = 37;
+  // The sandbar-generated unique ID of a transaction related to this one.
+  optional string related_transaction_sandbar_id = 38;
 }
 
 // A wrapper for an identifier for a given transaction.
@@ -713,10 +747,12 @@ message TransactionQueryIdParam {
 message GetTransactionsForEntityResponse {
   // Set of requested transactions.
   repeated Transaction transactions = 1;
-  // Message containing information about the processing of the request, including error messages
-  // and information about failure states of one or more request payloads.
-  string message = 2;
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 3;
+  reserved "2";
+  reserved "message";
 }
+
 
 // A request that allows a user to get all the transactions associated with a given entity.
 message GetTransactionsForEntityRequest {
@@ -1809,14 +1845,92 @@ message UnitCardVerificationData {
 }
 
 // EXPERIMENTAL FEATURE
+// A request to upload a Unit check deposit to Sandbar
+message CreateUnitCheckDepositRequest {
+  UnitCheckDeposit check_deposit = 1;
+}
+
+// EXPERIMENTAL FEATURE
+// Information about the Sandbar transaction created to represent the Unit check deposit
+message CreateUnitCheckDepositResponse {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
+  // The sandbar ID of the item created/changed/deleted by the event.
+  string sandbar_id = 2;
+  // The source ID of the item created/changed/deleted by the event that the time the event was sent.
+  string source_id = 3;
+  // In the event that there is an incomplete item, this is the sandbar-generated ID for the object.
+  string generated_id = 4;
+  // Specifies the type of payload that this message is in response to
+  EventResponseType event_response_type = 5;
+  // The Unit check deposit as a Sandbar entity event.
+  Event request = 6;
+}
+
+// EXPERIMENTAL FEATURE
+// A request to update a Unit check deposit previously uploaded to Sandbar
+message UpdateUnitCheckDepositRequest {
+  UnitCheckDeposit check_deposit = 1;
+}
+
+// EXPERIMENTAL FEATURE
+// A response containing information about the updated Sandbar transaction representing the Unit check deposit
+message UpdateUnitCheckDepositResponse {
+  // Information about processing the request, including any error information
+  google.rpc.Status status = 1;
+  // The sandbar ID of the item created/changed/deleted by the event.
+  string sandbar_id = 2;
+  // The source ID of the item created/changed/deleted by the event that the time the event was sent.
+  string source_id = 3;
+  // In the event that there is an incomplete item, this is the sandbar-generated ID for the object.
+  string generated_id = 4;
+  // Specifies the type of payload that this message is in response to
+  EventResponseType event_response_type = 5;
+  // The Unit check deposit as a Sandbar entity event.
+  Event request = 6;
+}
+
+// EXPERIMENTAL FEATURE
+// See https://docs.unit.co/resources#check-deposit
+message UnitCheckDeposit {
+  string type = 1;
+  string id = 2;
+  UnitCheckDepositAttributes attributes = 3;
+  UnitRelationships relationships = 4;
+}
+
+// EXPERIMENTAL FEATURE
+// Details about the Unit check deposit
+message UnitCheckDepositAttributes {
+  string created_at = 1;
+  string status = 2;
+  optional string reason = 3;
+  string description = 4;
+  int32 amount = 5;
+  optional string check_number = 6;
+  optional UnitCheckCounterparty counterparty = 7;
+  optional string settlement_date = 8;
+}
+
+
+// EXPERIMENTAL FEATURE
+// Information about the unit check counterparty
+message UnitCheckCounterparty {
+  string routing_number = 1;
+  string account_number = 2;
+  string name = 3;
+}
+
+// EXPERIMENTAL FEATURE
 message UnitRelationships {
   optional UnitRelatedCustomer customer = 1;
   optional UnitRelatedDepositAccount account = 2;
   optional UnitRelatedPayment payment = 3;
   optional UnitRelatedCounterparty counterparty = 4;
-  optional UnitRelatedTransaction transaction = 5;
+  optional UnitRelatedTransaction related_transaction = 5;
   optional UnitRelatedCounterpartyCustomer counterparty_customer = 6;
   optional UnitRelatedCounterpartyAccount counterparty_account = 7;
+  optional UnitRelatedReceiverAccount receiver_account = 8;
 }
 
 // EXPERIMENTAL FEATURE
@@ -1900,6 +2014,19 @@ message UnitRelatedCounterpartyCustomerData {
   string id = 2;
 }
 
+// EXPERIMENTAL FEATURE
+// Information about a Unit account receiving an award
+message UnitRelatedReceiverAccount {
+  UnitRelatedReceiverAccountData data = 1;
+}
+
+// EXPERIMENTAL FEATURE
+// Information about a Unit account receiving an award
+message UnitRelatedReceiverAccountData {
+  string type = 1;
+  string id = 2;
+}
+
 // The various possible results of a request to close an alert or investigation.
 enum CloseResult {
   CLOSE_RESULT_UNSPECIFIED = 0;
@@ -1954,6 +2081,12 @@ enum TransactionType {
   TRANSACTION_TYPE_GOVERNMENT_PAYMENT = 17;
   // Derivative contract where two parties exchange the cash flows or liabilities from two different financial instruments
   TRANSACTION_TYPE_SWAP = 18;
+  // Interest accrual
+  TRANSACTION_TYPE_INTEREST_PAYMENT = 19;
+  // An adjustment made to correct the account balance
+  TRANSACTION_TYPE_ADJUSTMENT = 20;
+  // An incentive to the account holder for certain activities
+  TRANSACTION_TYPE_REWARD = 21;
   // Another transaction type that is not enumerated here.
   TRANSACTION_TYPE_OTHER = 100;
 }
