@@ -198,7 +198,9 @@ export class Client {
       throw new TypeError("Missing account response, status " + status)
     }
     if (!grpcAccountEntityLinkResponse) {
-      throw new TypeError("Missing account entity link response, status " + status)
+      throw new TypeError(
+        "Missing account entity link response, status " + status
+      )
     }
     const accountResponse = translateEventResponse(grpcAccountResponse)
     const accountEntityLinkResponse = translateEventResponse(
