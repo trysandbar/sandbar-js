@@ -1,7 +1,7 @@
 {
   "name": "unit-example",
   "private": true,
-  "version": "0.1.0-alpha.12",
+  "version": "0.1.0-alpha.13",
   "description": "Example usage of the Unit-compatible functionality in the sandbar client library",
   "scripts": {
     "test": "jest --passWithNoTests",
@@ -16,6 +16,6 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^9.0.0",
-    "sandbar": "^0.1.0-alpha.12"
+    "sandbar": "^0.1.0-alpha.13"
   }
 }
