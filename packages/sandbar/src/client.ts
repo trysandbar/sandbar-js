@@ -8,11 +8,7 @@ import {
 import {
   CompleteEntity,
   CompleteEntityCreate,
-  Entity,
-  translateEntityResponse,
 } from "./translators/translate-entity"
-import { translateAccount } from "./translators/translate-account"
-import { translateTransaction } from "./translators/translate-transaction"
 import { IMessageType } from "@protobuf-ts/runtime"
 import { translateRuleOutput } from "./translators/translate-rule-output"
 import { translateEvent } from "./translators/translate-event"
